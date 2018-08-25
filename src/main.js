@@ -5,6 +5,10 @@ import App from './App'
 import router from './router'
 import Mint from 'mint-ui';
 import 'mint-ui/lib/style.css'
+import { Tabbar, TabItem } from 'mint-ui';
+
+Vue.component(Tabbar.name, Tabbar);
+Vue.component(TabItem.name, TabItem);
 Vue.use(Mint);
 
 Vue.config.productionTip = false
