@@ -3,10 +3,9 @@
    <router-view/>
    <div class="a-header">
      <p>购物车</p>
-     <span>编辑</span>
    </div>
    <div class="home">
-     <p>亚马逊图书自营</p>
+     <p>图书自营</p>
    </div>
    <cart></cart>
    <app-footer></app-footer>
@@ -42,6 +41,7 @@
     display: inline-block;
     line-height: 0.95rem;
     margin-left: 3.0rem;
+    font-size: 0.5rem;
   }
   .a-header span{
     margin-left: 1.7rem;

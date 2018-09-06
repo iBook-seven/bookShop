@@ -4,19 +4,85 @@
       <router-link class="st1" to="/setting">&#xe602;</router-link>
       <h2>性别</h2>
     </div>
-    <div class="op">男</div>
-    <div class="op">女</div>
-    <div class="yt1">保存</div>
+
+    <div class="io" >
+      <input  type="radio" name="sex" value="男"  @click="jud" />男<br>
+      <input  type="radio" name="sex" value="女"  @click="jud"/>女<br>
+      <button type="button" value="保存" class="sub" @click="jjd">保存</button>
+    </div>
+
   </div>
 </template>
 
 <script>
   export default {
-    name: "img"
+    name: "img",
+       data(){
+      return{
+        se:this.$route.query.Se,
+        is_Middle:"",
+        cc:'',
+      }
+       },
+
+    methods:{
+      jud(){
+        var aInt = document.querySelectorAll('input');
+        for (var i = 0; i < aInt.length; i++) {
+          if (aInt[i].checked == true) {
+
+             this.cc=aInt[i].value;
+
+          }
+        }
+      },
+      jjd(){
+        var that = this;
+        $.ajax({
+          url: 'http://h5h5h5.free.idcfengye.com/user/updateMyInfo.action',
+          type: 'post',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true    // 前端设置是否带cookie
+          },
+          data:{
+            userInfo:"u_sex:"+this.cc,
+          },
+          crossDomain: true,
+          success: function (goods) {
+            console.log(goods);
+            that.ssg = JSON.parse(JSON.stringify(goods));
+          },
+          error: function () {
+            console.log("出错");
+          }
+        })
+      }
+
+    },
+
   }
 </script>
 
 <style scoped>
+  .io input:nth-child(1),.io input:nth-of-type(2){
+    width:0.5rem;
+  height: 0.4rem;
+    margin-left:0.5rem;
+  }
+  .sub{
+    width:2rem;
+    line-height: 0.5rem;
+    color: white;
+    border:none;
+    border-radius: 3px;
+    background: #009a61;
+  }
+  .io{
+    display: block;
+    width: 4rem;
+    margin:1rem 40%;
+  }
   .img{
     position: relative;
     bottom: 0;
@@ -43,31 +109,6 @@
   h2{
     margin: 0 auto;
   }
-.op{
-  width:100%;
-  height: 0.6rem;
-  background: linear-gradient(to right,#009a61,lightgreen);
-  color: #fff;
-  border: 3px #9f9494  solid;
-  border-radius: 0.3rem;
-  font-size: 0.3rem;
-  float: left;
-/*  opacity: 0.7;*/
-  padding-top: 0.1rem;
-  margin-bottom: 0.1rem;
-  padding-left:3.8rem;
-}
-  .yt1{
-    float: left;
-    width:100%;
-    height:0.6rem;
-    color:#009a61;
-    background-color: #f3f3f3;
-    border: 1px #009a61  solid;
-    font-size: 0.3rem;
-    border-radius: 3rem;
-    padding-top: 0.1rem;
-    padding-left:3.7rem;
 
-  }
+
 </style>

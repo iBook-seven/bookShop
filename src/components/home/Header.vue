@@ -1,13 +1,23 @@
 <template>
   <div class="search">
-    <span class="icon-chazhao">&#xe617;</span>
-    <input type="search" name="search"/>
+    <span class="icon-chazhao" @click="find">&#xe617;</span>
+    <input type="search" name="search" v-model="key"/>
   </div>
 </template>
 
 <script>
     export default {
-        name: "Header"
+        name: "Header",
+      data(){
+        return{
+          key: '',
+        }
+      },
+      methods:{
+        find(){
+          this.$router.push({path:'/Search',query:{word: this.key}});
+        }
+      }
     }
 </script>
 
@@ -22,7 +32,7 @@
     align-items: center;
     margin: 0.2rem auto;
   }
-  .search .icon-chazhao{
+  .icon-chazhao{
     font-family: "iconfont";
     font-size: 0.38rem;
     color: #999;

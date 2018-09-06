@@ -7,14 +7,14 @@
         <span class="icon">&#xe783;</span>
       </div>
       <div class="time">
-        <p><span>01</span>时<span>02</span>分<span>22</span>秒</p>
+        <p><span>{{hour | addZ}}</span>时<span>{{minute | addZ}}</span>分<span>{{second | addZ}}</span>秒</p>
       </div>
       <ul>
-        <li v-for="good in goodsList">
-          <img :src="good.url"/>
-          <p>{{good.desc}}</p>
-          <h3>{{good.priceNow}}</h3>
-          <p>{{good.priceOld}}</p>
+        <li v-for="good in four">
+          <img :src="good.b_img"/>
+          <p>{{good.b_description}}</p>
+          <h3>￥{{good.b_price}}</h3>
+          <p>￥{{(good.b_price * 1.2).toFixed(2)}}</p>
         </li>
       </ul>
       <img src="../../assets/img/banner2.jpg" width="100%">
@@ -27,14 +27,65 @@
         name: "SuperKill",
         data(){
           return{
-            goodsList: [
-              {url: require('@/assets/img/book1.jpg'),desc: "精品图书文...", priceNow: "￥12.7",priceOld: "￥10.5"},
-              {url: require('@/assets/img/book2.jpg'),desc: "精品图书文...", priceNow: "￥13.5",priceOld: "￥10.5" },
-              {url: require('@/assets/img/book3.jpg'),desc: "精品图书文...", priceNow: "￥14.8",priceOld: "￥10.5" },
-              {url: require('@/assets/img/book3.jpg'),desc: "精品图书文...", priceNow: "￥34.1",priceOld: "￥10.5" }
-            ]
+            timer: null,
+            allTime: 4801,
+            hour: 0,
+            minute: 0,
+            second: 0,
+            goodsList: [],
+            four:[],
           }
-      }
+      },
+      mounted(){
+        var that = this;
+        this.timer = setInterval(function(){
+          that.getTime();
+          // console.log(that.hour+':'+that.minute+":"+that.second);
+        },1000);
+        this.show();
+        // this.goodsList.length = 4;
+
+      },
+      methods:{
+          getTime(){
+            this.hour = Math.floor(this.allTime/3600);
+            this.minute = Math.floor(this.allTime%3600/60);
+            this.second = Math.floor(this.allTime%60);
+            if(this.allTime>=1){
+              this.allTime--;
+            }
+            else{
+              clearInterval(this.timer);
+            }
+          },
+        show(){
+          var that = this;
+          $.ajax({
+            url: 'http://localhost:8080/bookInformation/queryAllBooks.action',
+            type: 'post',
+            dataType: 'json',
+            data: {date: '10:00'},
+            xhrFields: {
+              withCredentials: true   // 前端设置是否带cookie
+            },
+            crossDomain: true,
+            success: function (goods) {
+              that.goodsList = JSON.parse(JSON.stringify(goods));
+              that.four = that.goodsList.slice(0,4);
+              console.log(that.four);
+            },
+            error: function () {
+              console.log("出错了！");
+            }
+          })
+        },
+      },
+      filters: {
+          addZ: function(value){
+            return value>10 ? ''+value : '0'+value;
+          }
+      },
+
     }
 </script>
 
@@ -91,15 +142,16 @@
     padding: 0.05rem;
     display: flex;
     justify-content: space-between;
+    flex-wrap: wrap;
   }
   section ul li{
-    width: 24.5%;
+    width: 25%;
     margin: 0 auto;
     border-right: 1px solid #e6e6e6;
   }
   section ul li img{
-    width: 1.2rem;
-    height: 1.25rem;
+    width: 1.3rem;
+    height: 1.35rem;
     margin: 0 auto;
   }
   section ul li p:nth-of-type(1){
@@ -108,6 +160,10 @@
     font-size: 0.18rem;
     line-height: 0.28rem;
     color: #323232;
+    width: 90%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   section ul li h3{
     color: forestgreen;

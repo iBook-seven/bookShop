@@ -5,25 +5,24 @@
       <h2>秒杀</h2>
     </div>
     <ul class="time">
-      <li><span>00:00</span><span>已开抢</span></li>
-      <li class="active"><span>10:00</span><span>进行中</span></li>
-      <li><span>12:00</span><span>未开抢</span></li>
-      <li><span>17:00</span><span>未开抢</span></li>
-      <li><span>22:00</span><span>未开抢</span></li>
+      <li v-for="(item,index) in timeList" :class="{active: index==n}"
+         @click="show(item,index)">
+        <span>{{item.time}}</span><span>{{item.status}}</span>
+      </li>
     </ul>
     <ul class="list">
       <li v-for="item in goodsList" class="clearfix">
-        <div class="left"><img :src="item.url"/></div>
+        <div class="left"><img :src="item.b_img"/></div>
         <div class="right">
-          <p>{{item.desc}}</p>
-          <span>{{item.priceNow}}</span>
-          <span>{{item.priceOld}}</span>
-          <router-link to="/ProductDetails"><div class="ready">马上抢</div></router-link>
+          <p>{{item.b_description}}</p>
+          <span>￥{{item.b_price}}</span>
+          <span>￥{{(item.b_price*0.7).toFixed(2)}}</span>
+          <div class="ready" @click="goto(item)">马上抢</div>
           <div class="clearfix wrap">
             <div class="bar">
-              <div></div>
+              <div class="line"></div>
             </div>
-            <span>已抢99%</span>
+            <span>已抢{{(item.b_saleNum/item.b_total).toFixed(2)*100}}%</span>
           </div>
         </div>
       </li>
@@ -36,17 +35,72 @@
         name: "SuperKillPage",
       data(){
           return{
+            n: 0,
+            timeList:[
+              {time: '00:00',status: '已开抢'},
+              {time: '10:00',status: '进行中'},
+              {time: '12:00',status: '未开抢'},
+              {time: '17:00',status: '未开抢'},
+              {time: '22:00',status: '未开抢'}],
             goodsList: [
-              {url: require('@/assets/img/book1.jpg'),desc: "精品图书文精品图书文精品图书文精品图书文", priceNow: "￥12.7",priceOld: "￥10.5"},
-              {url: require('@/assets/img/book2.jpg'),desc: "精品图书文...", priceNow: "￥13.5",priceOld: "￥10.5" },
-              {url: require('@/assets/img/book3.jpg'),desc: "精品图书文...", priceNow: "￥14.8",priceOld: "￥10.5" },
-              {url: require('@/assets/img/book3.jpg'),desc: "精品图书文...", priceNow: "￥34.1",priceOld: "￥10.5" }
+              // {url: require('@/assets/img/book1.jpg'),desc: "精品图书文精品图书文精品图书文精品图书文", priceNow: "￥12.7",priceOld: "￥10.5"},
+              // {url: require('@/assets/img/book2.jpg'),desc: "精品图书文...", priceNow: "￥13.5",priceOld: "￥10.5" },
+              // {url: require('@/assets/img/book3.jpg'),desc: "精品图书文...", priceNow: "￥14.8",priceOld: "￥10.5" },
+              // {url: require('@/assets/img/book3.jpg'),desc: "精品图书文...", priceNow: "￥34.1",priceOld: "￥10.5" }
             ]
           }
       },
+      mounted: function(){
+        this.show();
+      },
       methods:{
+        show(item,num){
+          this.n = num;
+          var that = this;
+          console.log(item.time);
+          $.ajax({
+            url: 'http://localhost:8080/bookInformation/queryAllBooks.action',
+            type: 'post',
+            dataType: 'json',
+            data: {date: item.time},
+            xhrFields: {
+              withCredentials: true   // 前端设置是否带cookie
+            },
+            crossDomain: true,
+            success: function (goods) {
+              that.goodsList = JSON.parse(JSON.stringify(goods));
+              console.log(goods);
+            },
+            error: function () {
+              console.log("出错了！");
+            }
+          })
+        },
+        show(){
+          var that = this;
+          $.ajax({
+            url: 'http://localhost:8080/bookInformation/queryAllBooks.action',
+            type: 'post',
+            dataType: 'json',
+            data: {date: '12:00'},
+            xhrFields: {
+              withCredentials: true   // 前端设置是否带cookie
+            },
+            crossDomain: true,
+            success: function (goods) {
+              that.goodsList = JSON.parse(JSON.stringify(goods));
+              console.log(goods);
+            },
+            error: function () {
+              console.log("出错了！");
+            }
+          })
+        },
+        goto(item){
+          this.$router.push({path: '/ProductDetails',query:{id: item.b_id}});
+        }
+      },
 
-      }
     }
 </script>
 
@@ -125,6 +179,8 @@
     width: 95%;
     font-size: 0.26rem;
     color: #49505e;
+    height: 1rem;
+    overflow: hidden;
     line-height: 0.32rem;
   }
   .list .right span:nth-of-type(1){
@@ -160,8 +216,8 @@
     margin-right: 0.2rem;
   }
   .list .right .bar div{
-     width: 40%;
-     height: 0.1rem;
+    width: 40%;
+    height: 0.1rem;
     border-radius: 0.05rem;
     background-color: #009a61;
   }

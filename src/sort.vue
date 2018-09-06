@@ -3,59 +3,65 @@
       <!--header-->
     <div class="header">
         <div class="search">
-          <span class="icon-chazhao">&#xe617;</span>
-          <router-link to="catalog"><input type="text" name="search"/></router-link>
+          <router-link :to="{path:'/catalog',query:{num:we}}"><span class="icon-chazhao">&#xe617;</span></router-link>
+          <input type="search" name="search" v-model="we"/>
         </div>
     </div>
       <!--nav-->
       <div class="clearfix">
       <div class="nav">
-        <div>{{t1}}</div>
-        <div>{{t2}}</div>
-        <div>{{t3}}</div>
-        <div>{{t4}}</div>
-        <div>{{t5}}</div>
-        <div>{{t6}}</div>
-        <div>{{t7}}</div>
-        <div>{{t8}}</div>
-        <div>{{t9}}</div>
+        <div @click="show(item,index)" v-for="(item,index) in books"
+             :class="{active:index==n}">{{item.t}}</div>
       </div>
       <!--content-->
       <div class="content">
         <div class="lunbo">
+          <mt-swipe :auto="2000">
+            <mt-swipe-item v-for="item in items" :key="item.id">
+              <a :href="item.href" rel="external nofollow" >
+                <img :src="item.url" class="img" width="100%" height="100%"/>
+                <span class="desc"></span>
+              </a>
+            </mt-swipe-item>
+          </mt-swipe>
         </div>
         <div class="wrap">
           <div class="left">
             <h5>进入电子书馆</h5>
             <p>精选版</p>
-            <span>></span>
+            <!--<router-link :to="{path:'/catalog',query:{chuan:this.word}}">-->
+              <span @click = send class="icon">&#xe6e0;</span>
+            <!--</router-link>-->
           </div>
           <div class="right">
             <h5>进入童书馆</h5>
             <p>精选版</p>
-            <span>></span>
+            <span class="icon">&#xe6e0;</span>
           </div>
         </div>
         <div class="jpg">
-          <div class="p1">
-            <h4>畅销榜</h4><router-link to="/bang"><span>></span></router-link>
-            <div class="i1">
-              <img :src="item.url" alt="" v-for="item in psdList"
-                   width="80" height="110">
-            </div>
+        <div class="p1">
+          <h4>畅销榜</h4>
+          <span @click="more">&#xe6e0;</span>
+          <div class="i1" >
+            <img :src="item.b_img" alt="" v-for="item in one" width="80" height="110">
           </div>
-          <div class="p2">
-            <h4>热搜榜</h4><span>></span>
-            <div class="i1">
-              <img :src="item.url" alt="" v-for="item in psdList" width="80" height="110">
-            </div>
+        </div>
+        <div class="p2">
+          <h4>热搜榜</h4>
+          <span @click="more">&#xe6e0;</span>
+          <div class="i1">
+            <img :src="item.b_img" alt="" v-for="item in two" width="80" height="110">
           </div>
-          <div class="p3">
-            <h4>热卖榜</h4><span>></span>
-            <div class="i1">
-              <img :src="item.url" alt="" v-for="item in psdList" width="80" height="110">
-            </div>
+        </div>
+        <div class="p3">
+          <h4>热卖榜</h4>
+          <span @click="more">&#xe6e0;</span>
+          <div class="i1">
+            <img :src="item.b_img" alt="" v-for="item in three" width="80" height="110">
           </div>
+        </div>
+
         </div>
       </div>
       </div>
@@ -67,38 +73,116 @@
 
 <script>
   import Footer from './components/home/Footer'
+  import {Swipe, SwipeItem} from 'mint-ui'
+
     export default {
         name: "sort",
       data(){
           return{
-            //  nav
-            t1:"图书",
-            t2:"童书",
-            t3:"电子书",
-            t4:"教科书",
-            t5:"历史书",
-            t6:"军事书",
-            t7:"艺术",
-            t8:"外语书",
-            t9:"宗教",
+            we:"",
+            // nav
+            word:'',
+            books:[
+              {t:"计算机"},
+              {t:"艺术"},
+              {t:"电子书"},
+              {t:"教科书"},
+              {t:"历史书"},
+              {t:"军事书"},
+              {t:"社会"},
+              {t:"外语书"},
+              {t:"宗教"},
+            ],
+            n:0,
             //content
-            psdList:[
-              {url:require('@/assets/img/1.jpg')},
-              {url:require('@/assets/img/2.jpg')},
-              {url:require('@/assets/img/3.jpg')},
-            ]
-
+            psdList:[],
+            items: [{
+              url: require('@/assets/img/banner1.jpg')
+            }, {
+              url: require('@/assets/img/banner2.jpg')
+            }, {
+              url: require('@/assets/img/banner3.jpg')
+            }
+            ],
+            one:[],
+            two:[],
+            three:[]
           }
       },
-      components:{
-        "app_footer": Footer
-      }
+      mounted: function(){
+         this.display();
+      },
+      methods: {
+        send(){
+          this.$router.push({path: '/catalog',query:{chuan: this.word}});
+        },
+        more(){
+          this.$router.push({path: '/bang',query:{list: this.psdList}});
+        },
+        show(item,index){
+          this.n =index;
+          console.log(item.t);
+          this.word = item.t;
+          var that = this;
+          $.ajax({
+            url:'http://h5h5h5.free.idcfengye.com/bookInformation/hotSaleController.action',
+            type: 'post',
+            dataType: 'json',
+            data:{b_category: item.t},
+            xhrFields: {
+              withCredentials: true
+            },
+            crossDomain: true,
+            success: function (goods) {
+              that.psdList = JSON.parse(JSON.stringify(goods));
+              console.log(goods);
+              that.one = that.psdList.slice(0,3);
+              that.two = that.psdList.slice(3,6);
+              that.three = that.psdList.slice(6,9);
+            },
+            error: function () {
+              console.log("出错了！");
+            }
+          })
+        },
+        display(){
+          var that = this;
+          $.ajax({
+            url:'http://h5h5h5.free.idcfengye.com/bookInformation/hotSaleController.action',
+            type: 'post',
+            dataType: 'json',
+            data:{b_category: '计算机'},
+            xhrFields: {
+              withCredentials: true
+            },
+            crossDomain: true,
+            success: function (goods) {
+              that.psdList = JSON.parse(JSON.stringify(goods));
+              console.log(goods);
+              that.one = that.psdList.slice(0,3);
+              that.two = that.psdList.slice(3,6);
+              that.three = that.psdList.slice(6,9);
+            },
+            error: function () {
+              console.log("出错了！");
+            }
+          })
+        },
 
+      },
+      components:{
+        "app_footer": Footer,
+        'mt-swipe': Swipe,
+        'mt-swipe-item': SwipeItem,
+      }
     }
 </script>
 
 <style scoped>
   /*header*/
+  .icon{
+    font-family: iconfont;
+  }
   .sort{
     background-color: #eff4fa;
   }
@@ -136,14 +220,17 @@
     /*display:flex;*/
     /*flex-direction: column;*/
     width:27%;
-    padding-bottom: 0.5rem;
+    padding-bottom: 1.2rem;
     background-color: white;
     line-height: 1.2rem;
     text-align: center;
-    font-size:0.3rem;
+    /*font-size:0.3rem;*/
     float:left;
-    /*font-weight: bold;*/
     margin-right: 0.2rem;
+  }
+  .active{
+    background-color:#eff4fa;
+    color: forestgreen;
   }
   /*content*/
   .content{
@@ -159,8 +246,11 @@
     height: 2rem;
     background-color: limegreen;
   }
+  .mint-swipe {
+    height: 2rem;
+  }
   .wrap{
-    margin-top:0.1rem;
+    margin-top:0.2rem;
     display: flex;
     justify-content: space-between;
   }
@@ -169,24 +259,15 @@
     height: 1rem;
     background-color: white;
     position: relative;
+    padding: 0.1rem 0.2rem;
   }
-  .p1{
+  .p1,.p2,.p3{
     width:100%;
-    height: 3rem;
     background-color: white;
-    margin:0.1rem auto;
+    margin:0.2rem;
   }
-  .p2{
-    width:100%;
-    height: 3rem;
-    background-color: white;
-
-  }
-  .p3{
-    width:100%;
-    height: 3rem;
-    background-color: white;
-    margin: 0.1rem auto;
+  .p1,.p2,.p3 span{
+    font-family: iconfont;
   }
   .left span{
     position:absolute;
@@ -229,15 +310,14 @@
   }
   .p1,.p2,.p3{
     position:relative;
+    height: 2.5rem;
   }
   .i1 img{
     display:inline-block;
-    margin:20px auto;
+    /*margin: 0.2rem 0.1rem;*/
     height:1.5rem;
   }
   .i1{
-    display: flex;
-    justify-content: space-around;
-    margin:0 auto;
+
   }
 </style>

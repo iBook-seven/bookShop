@@ -6,8 +6,8 @@
 
       </div>
       <div class="pj">
-        <img :src="ei.url">
-        <p class="pd">{{ei.ut}}</p>
+        <img :src="ww">
+        <p class="pd">{{cil }}</p>
         <ul>
           <span v-for="(a,index) of arr"
               :class="{active:index<=n}"
@@ -15,11 +15,12 @@
         </ul>
         <p class="pdf">{{arr[n]}}</p>
       </div>
-      <form>
-        发表评论
-        <input type="textarea">
-        <button type="submit" class="ci">发布</button>
-      </form>
+
+        发表评论 <br>
+      <textarea  class="wr" v-model="content" ></textarea >
+       <!-- <input type="textarea" > v-model="we"-->
+        <button type="submit" class="ci" @click="aj(star,content)">发布</button>
+
 
     </div>
 </template>
@@ -30,24 +31,72 @@
         name: "a-judge",
       data(){
           return{
-            ei:{
-              url:require('../../assets/img/1.jpg'),
-              ut:'书籍信息'
-            },
+            cil:this.$route.query.num,//name
+            ww:this.$route.query.wwe,//图片
             arr : ["很差","差","一般","好","完美"],
-            n : 0
+            n : 0,
+            star:"",//存放星星变量值
+            id : this.$route.query.er,//u_id的传递
+            result1:null,
+            content: '',
           }
       },
       methods:{
+          /*ah(){
+            // var ire=uv;
+            // var ir=index;
+            console.log(this.star);
+            console.log(this.content);
+            console.log(this.id);
+          },*/
+        aj()
+        {
+          var that = this;
+          $.ajax({
+            url: 'http://h5h5h5.free.idcfengye.com/order/updateStatus2_3.action',
+            type: 'post',
+            dataType: 'json',
+            data:{ b_id: item.b_id},
+            xhrFields: {
+              withCredentials: true    // 前端设置是否带cookie
+            },
+            crossDomain: true,
+
+          });
+          $.ajax({
+            url: 'http://h5h5h5.free.idcfengye.com/comments/addComments.action',
+            type: 'post',
+            dataType: 'json',
+            xhrFields: {
+              withCredentials: true    // 前端设置是否带cookie
+            },
+            data:{
+              c_content:this.content,
+              c_level:this.star,
+              b_id:this.id,
+            },
+            crossDomain: true,
+
+          })
+        },
         changeN (i){
           this.n = i;
           // $('.star').html('&#xe633;');
-        }
-      }
+          this.star=this.n+1;
+        },
+
+
+
+      },
     }
 </script>
 
 <style scoped>
+  .wr{
+    width:100%;
+    height:20%;
+    vertical-align: top;
+  }
   .header1{
 
     width:100%;

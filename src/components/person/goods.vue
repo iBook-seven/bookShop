@@ -1,21 +1,20 @@
 <template>
   <ul class="part">
-    <li class="part1 clearfix" v-for="(u,index) in jpgList">
+    <li class="part1 clearfix" v-for="(u,index) in ssg">
       <div class="left">
-        <!--<span>{{index+1}}</span>-->
         <img :src="u.url" width="100" height="100"/>
       </div>
       <div class="right">
-        <p>{{u.title}}</p>
+        <p>{{u.b_name}}</p>
       </div>
       <div class="lo">
-        <h5>{{u.priceNew}}</h5>
-        <h6>{{u.priceOld}}</h6>
+        <h5>{{u.b_price*u.b_discountPrice}}</h5>
+        <h6>{{u.b_price}}</h6>
       </div>
       <div class="ko">
-        <div class="po">总计钱数{{u.allprice}}</div>
+        <div class="po">总计钱数{{u.number*u.b_price*u.b_discountPrice}}</div>
         <br>
-        <div class="del">{{u.ke}}</div>
+        <div class="del">取消订单</div>
       </div>
     </li>
   </ul>
@@ -26,32 +25,30 @@
         name: "goods",
       data(){
         return{
-          jpgList:[
-            {url:require('../../assets/img/1.jpg'),
-              title:'中国历史',
-               author:'匿名',
-              priceNew:'￥40.80',
-              priceOld:'￥45.00',
-              allprice:'￥26.60',
-              ke:'取消订单'},
-            {url:require('../../assets/img/2.jpg'),
-              title:'解忧杂货',
-              author:'东野圭吾',
-              priceNew:'￥30.90',
-              priceOld:'￥34.00',
-              allprice:'￥26.60',
-              ke:'取消订单'},
-            {url:require('../../assets/img/3.jpg'),
-              title:'我不',
-              author:'大冰',
-              priceNew:'￥26.60',
-              priceOld:'￥28.00',
-               allprice:'￥26.60',
-               ke:'取消订单'
-            }
-          ]
+          ssg: [],
         }
-      }
+      },
+      methods:{
+        tj(){
+          var that = this;
+          $.ajax({
+            url: 'http://h5h5h5.free.idcfengye.com/showOrder/showAllOrder.action',
+            type: 'post',
+            dataType: 'json',
+            xhrFields: {
+              withCredentials: true    // 前端设置是否带cookie
+            },
+            crossDomain: true,
+            success: function (goods) {
+              console.log(goods);
+              that.ssg = JSON.parse(JSON.stringify(goods));
+            },
+            error: function () {
+              console.log("出错");
+            }
+          })
+        }
+      },
     }
 </script>
 

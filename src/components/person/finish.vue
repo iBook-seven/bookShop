@@ -13,17 +13,18 @@
     </ul>
     <li class="part1 clearfix" v-for="(u,index) in jpgList">
       <div class="left">
-        <img :src="u.url" width="100" height="100"/>
+        <img :src="u.b_img" width="100" height="100"/>
       </div>
       <div class="right">
-        <h2>{{u.title}}</h2>
+        <p class="ido">{{u.b_name}}</p>
       </div>
       <div class="lo">
-        <h5>{{u.priceNew}}</h5>
-        <h6>{{u.priceOld}}</h6>
+        <h5>现价{{(u.b_price*u.b_discountPrice*0.1).toFixed(2)}}</h5>
+        <h6>原价{{u.b_price}}</h6>
       </div>
       <div class="ko">
-        <div class="po">总计钱数{{u.allprice}}</div>
+        <div>数量{{u.number}}</div>
+        <div class="po">总计钱数{{(u.b_price*u.b_discountPrice*u.number*0.1).toFixed(2)}}</div>
         <br>
 
 
@@ -38,37 +39,51 @@
     name: "collect",
     data(){
       return{
-        jpgList:[
-          {url:require('../../assets/img/1.jpg'),
-            title:'中国历史',
-            author:'匿名',
-            priceNew:'￥40.80',
-            priceOld:'￥45.00',
-            allprice:'￥26.60',
-          },
-          {url:require('../../assets/img/2.jpg'),
-            title:'解忧杂货铺',
-            author:'东野圭吾',
-            priceNew:'￥30.90',
-            priceOld:'￥34.00',
-            allprice:'￥26.60',
-          },
-          {url:require('../../assets/img/3.jpg'),
-            title:'我不',
-            author:'大冰',
-            priceNew:'￥26.60',
-            priceOld:'￥28.00',
-            allprice:'￥26.60',
+        jpgList: [],
 
-          }
-        ]
       }
+    },
+    mounted(){
+      this.aj();
+    },
+    methods:{
+      aj()
+      {
+        var that = this;
+        $.ajax({
+          url: 'http://h5h5h5.free.idcfengye.com/showOrder/showOrder3.action',
+          type: 'post',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true    // 前端设置是否带cookie
+          },
+
+          crossDomain: true,
+          success: function (goods) {
+            console.log(goods);
+            that.jpgList = JSON.parse(JSON.stringify(goods));
+          },
+          error: function () {
+            console.log("出错");
+          }
+        })
+      },
+
     }
   }
 
 </script>
 
 <style scoped>
+  .ido{
+    width: 2.8rem;
+    overflow: hidden;
+    height:1rem;
+    float: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding-top:0.5rem;
+  }
   .router-link-active{
     color: #009a61;
   }
@@ -131,15 +146,9 @@
     float: left;
     position: relative;
     height: 2.5rem;
-    margin-right: 1.5rem;
+    margin-right: 1rem;
   }
-  .right{
-    float: left;
-    position: relative;
-    line-height: 0.2rem;
-    padding-top:0.1rem;
-    padding-bottom: 0.1rem;
-  }
+
   .right h2{
     position: absolute;
     margin-left: 40%;
@@ -160,8 +169,11 @@
   .right{
     display: flex;
     flex-grow: 2;
+    float: left;
+    position: relative;
+    padding-top:0.1rem;
+    padding-bottom: 0.1rem;
 
-    margin:1rem auto;
   }
   .lo{
     margin-top: 1rem;

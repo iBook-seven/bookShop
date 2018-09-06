@@ -5,7 +5,9 @@ import App from './App'
 import router from './router'
 import Mint from 'mint-ui';
 import 'mint-ui/lib/style.css'
+import VueLazyload from 'vue-lazyload'
 Vue.use(Mint);
+Vue.use(VueLazyload);
 
 Vue.config.productionTip = false
 

@@ -7,25 +7,26 @@
     <ul class="xc">
       <router-link to="/order" tag="li">全部</router-link>
       <router-link to="/apply" tag="li">待付款</router-link>
-      <router-link to="/order" tag="li">待收货</router-link>
+      <router-link to="/ssh" tag="li">待收货</router-link>
       <router-link to="/judge" tag="li">待评价</router-link>
       <router-link to="/finish" tag="li">已完成</router-link>
     </ul>
     <li class="part1 clearfix" v-for="(u,index) in jpgList">
       <div class="left">
-        <img :src="u.url" width="100" height="100"/>
+        <img :src="u.b_img" width="100" height="100"/>
       </div>
       <div class="right">
-        <p>{{u.title}}</p>
+        <p id="ido">{{u.b_description}}</p>
       </div>
       <div class="lo">
-        <h5>{{u.priceNew}}</h5>
-        <h6>{{u.priceOld}}</h6>
+        <h5>现价:{{(u.b_price*u.b_discountPrice*0.1).toFixed(2)}}</h5>
+        原价:<h6>{{u.b_price}}</h6>
       </div>
       <div class="ko">
-        <div class="po">总计钱数{{u.allprice}}</div>
+        <div>数量{{u.number}}</div>
+        <div class="po">总计钱数{{(u.b_price*u.b_discountPrice*u.number*0.1).toFixed(2)}}</div>
         <br>
-        <router-link to="judges"><div class="del">{{u.ke}}</div></router-link>
+        <div class="del" @click="change(u)">评价</div>
 
       </div>
     </li>
@@ -35,39 +36,59 @@
 <script>
   export default {
     name: "judge",
-    data(){
-      return{
-        jpgList:[
-          {url:require('../../assets/img/1.jpg'),
-            title:'中国历史',
-            author:'匿名',
-            priceNew:'￥40.80',
-            priceOld:'￥45.00',
-            allprice:'￥26.60',
-            ke:'评价订单'},
+    data() {
+      return {
+        jpgList: [],
 
-          {url:require('../../assets/img/2.jpg'),
-            title:'解忧杂货铺',
-            author:'东野圭吾',
-            priceNew:'￥30.90',
-            priceOld:'￥34.00',
-            allprice:'￥26.60',
-            ke:'评价订单'},
-          {url:require('../../assets/img/3.jpg'),
-            title:'我不',
-            author:'大冰',
-            priceNew:'￥26.60',
-            priceOld:'￥28.00',
-            allprice:'￥26.60',
-            ke:'评价订单'
-          }
-        ]
       }
-    }
+    },
+    mounted(){
+      this.aj();
+    },
+
+        methods:{
+          change(item){
+            this.$router.push({path: '/judges' ,
+              query:{num: item.b_description,wwe:item.b_img,er:item.b_id}})
+          },
+        aj()
+        {
+          var that = this;
+          $.ajax({
+            url: 'http://h5h5h5.free.idcfengye.com/showOrder/showOrder2.action',
+            type: 'post',
+            dataType: 'json',
+            xhrFields: {
+              withCredentials: true    // 前端设置是否带cookie
+            },
+
+            crossDomain: true,
+            success: function (goods) {
+              console.log(goods);
+              that.jpgList = JSON.parse(JSON.stringify(goods));
+            },
+            error: function () {
+              console.log("出错");
+            }
+          })
+        },
+
+      }
+
+
   }
 </script>
 
 <style scoped>
+  .left img{
+    vertical-align: auto;
+  }
+  .right p{
+
+    heihgt:1rem;
+    line-height: 1rem;
+    overflow: hidden;
+  }
   .router-link-active{
     color: #009a61;
   }
@@ -132,13 +153,7 @@
     height: 2.5rem;
     margin-right: 1.5rem;
   }
-  .right{
-    float: left;
-    position: relative;
-    line-height: 0.2rem;
-    padding-top:0.1rem;
-    padding-bottom: 0.1rem;
-  }
+
   .right h2{
     position: absolute;
     margin-left: 40%;
@@ -154,13 +169,13 @@
     font-family: 'iconfont';
     font-size: 0.1rem;
   }
-
-
-  .right{
-    display: flex;
-    flex-grow: 2;
-
-    margin:1rem auto;
+  #ido{
+    width: 2.8rem;
+    overflow: hidden;
+    height:1rem;
+    float: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .lo{
     margin-top: 1rem;

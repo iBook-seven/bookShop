@@ -2,22 +2,80 @@
   <div id="register">
     <router-link to="/Login"><span class="iconfont header">&#xe606;</span></router-link>
     <p class="register-p">注册新用户</p>
-    <form action="#" method="post" name="form">
+    <form method="post" name="form" action="http://5tk2th.natappfree.cc/user/sendMessage_phone.action">
       <div class="register-tel">
         <span class="iconfont">&#xe613;</span>
-        <input type="text" name="tel" placeholder="请输入手机号"/>
+        <input type="text" name="u_phone" placeholder="请输入手机号"  v-model="u_phone" @blur="GetUserP"/>
       </div>
-      <router-link to="/RNoteGet"><a href="" class="register-geting">获取验证码</a></router-link>
+      <input type="button" value="获取验证码" class="register-geting" @click="Rgetn" />
     </form>
+    <p v-show="phoneAlert">请输入正确的手机号</p>
+    <p>{{hello}}</p>
   </div>
 </template>
 
 <script>
   export default {
-    name: 'HelloWorld',
+    name: 'Register',
     data () {
       return {
+        phoneAlert:false,
+        u_phone:'',
+        hello:''
+      }
+    },
+    methods:{
+      GetUserP:function(){
+        var emph=$("input")[0].value;
+        var regMobile=/^1\d{10}$/;
+        var that=this;
+        if(regMobile.test(emph)==false){
+          this.phoneAlert=!this.phoneAlert;
+        }
+        this.phoneAlert=this.phoneAlert;
+        $.ajax({
+          url: 'http://h5h5h5.free.idcfengye.com/user/queryByPhone.action',
+          data:{u_phone:this.u_phone},
+          type: 'post',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true   //前端设置是否带cookie
+          },
+          crossDomain: true,
+          success: function (list) {
+            var hell=JSON.parse(JSON.stringify(list));
+            if(hell.message=="success"){
+            }else{
+              //that.hello=hell.message;
+            }
+          },
+          error: function () {
+          }
+        })
+      },
+      Rgetn:function(){
+        var that=this;
+        $.ajax({
+          url: 'http://h5h5h5.free.idcfengye.com/user/sendMessage_phone.action',
+          data:{u_phone:this.u_phone},
+          type: 'post',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true   //前端设置是否带cookie
+          },
+          crossDomain: true,
+          success: function (list) {
+            var hel=JSON.parse(JSON.stringify(list));
+            if(hel.message=="success"){
+              that.$router.push({path:'/RNoteGet'});
+            }else{
+              that.hello = hel.message;//弹出的字段
+            }
+          },
+          error: function () {
 
+          }
+        })
       }
     }
   }
@@ -45,8 +103,9 @@
   }
   form input {
     border:none;
-    font-size: 0.22rem;
     line-height:1rem;
+    margin-left: 0.3rem;
+    font-size: 0.3rem;
   }
   form div {  width:80%;
     height:1.3rem;
@@ -57,10 +116,11 @@
     text-align: left;
     display:flex;
     flex-direction: row;
-    justify-content: space-between;
     padding-top:0.3rem;
   }
-  .register-geting {  width:80%;
+  .register-geting {
+    display:block;
+    width:80%;
     height:0.9rem;
     margin:0.8rem auto;
     text-align:center;

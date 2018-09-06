@@ -4,14 +4,58 @@
         <router-link class="st1" to="/setting">&#xe602;</router-link>
         <h2>个性签名</h2>
       </div>
-      <textarea  id="tt" cols="30" rows="10"></textarea>
-      <div class="yt1">保存</div>
+      <textarea  id="tt" cols="30" rows="10"  v-model="ui" @blur="judge">{{ui}}</textarea>
+      <button type="button" class="yt1" @click="judge" >保存</button>
     </div>
 </template>
 
 <script>
     export default {
-        name: "sign"
+        name: "sign",
+
+      data(){
+
+        return{
+
+         ui: this.$route.query.sig,
+          /*   {
+             name:'cl',
+             sex:'女',
+             birthday:'0304',
+             tel:'12345678901'
+           }*/
+
+        }
+      },
+
+
+      methods: {
+        judge(){
+          var that = this;
+          $.ajax({
+            url: 'http://h5h5h5.free.idcfengye.com/user/updateMyInfo.action',
+            type: 'post',
+            dataType: 'json',
+            xhrFields: {
+              withCredentials: true    // 前端设置是否带cookie
+            },
+            data:{
+              userInfo:"u_idiograph:"+this.ui,
+            },
+            crossDomain: true,
+            success: function (goods) {
+              console.log(goods);
+              that.ssg = JSON.parse(JSON.stringify(goods));
+            },
+            error: function () {
+              console.log("出错");
+            }
+          })
+
+        },
+      },
+
+
     }
 </script>
 

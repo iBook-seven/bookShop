@@ -7,7 +7,7 @@
     <ul class="show">
       <li v-for="item in newsList">
         <div>热卖</div>
-        <span>{{item.title}}</span>
+        <span id="txt">{{item.title}}</span>
         <router-link to="/NewsPage" class="jump">更多</router-link>
       </li>
     </ul>
@@ -19,9 +19,36 @@
         name: "NewsPage",
         data(){
           return{
-            newsList:[{title: "猫贝乐电子琴"},{title: "中小学生读物"},{title: "暑假作业热销"},]
+            newsList:[
+              {title: "猫贝乐电子琴"},{title: "中小学生读物"},{title: "暑假作业热销"},
+            ]
           }
-      }
+      },
+      mounted: function(){
+        // this.show();
+      },
+      methods:{
+        show(){
+          var that = this;
+          $.ajax({
+            url: 'http://localhost:8080/bookInformation/queryAllActivitySale.action',
+            type: 'post',
+            dataType: 'json',
+            xhrFields: {
+              withCredentials: true   // 前端设置是否带cookie
+            },
+            crossDomain: true,
+            success: function (goods) {
+              that.newsList = JSON.parse(JSON.stringify(goods));
+              console.log(goods);
+            },
+            error: function () {
+              console.log("出错了！");
+            }
+          })
+        }
+      },
+
     }
 </script>
 

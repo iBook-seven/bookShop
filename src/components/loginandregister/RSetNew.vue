@@ -1,31 +1,94 @@
 <template>
   <div id="rsetnew">
     <router-link to="/RNoteGet"><span class="iconfont header">&#xe606;</span></router-link>
-    <form action="#" method="post" name="form">
+    <form action="http://5tk2th.natappfree.cc/user/register.action" method="post" name="form">
       <p class="r-write">用户名</p>
       <div class="r-user">
         <span class="iconfont">&#xe658;</span>
-        <input type="text" name="r-user-write" placeholder="请输入用户名"/>
+        <input type="text" name="u_name" placeholder="请输入用户名" @blur="Nameu" v-model="u_name"/>
         <span class="iconfont r-password-open">&#xe901;</span>
       </div>
       <p class="r-write">设置密码</p>
       <div class="r-password">
         <span class="iconfont">&#xe604;</span>
-        <input type="text" name="r-password" placeholder="请输入密码"/>
+        <input type="text" name="u_password" placeholder="请输入密码" @blur="Paswo" v-model="u_password"/>
         <span class="iconfont r-spassword-open">&#xe901;</span>
       </div>
-      <router-link to="/Login"><a href="" class="setingnpwd">完成</a></router-link>
+      <router-link to="/Login"><input type="button" class="setingnpwd" value="完成" @click="Fin"/></router-link>
     </form>
+    <p class="goodpsd" v-show="goodpsda">密码不能含有非法字符，长度在4-10之间</p>
     <p class="set-about">为保障您账户安全，请不要设置与邮箱密码相同的账户登录密码，谨防诈骗</p>
+    <p>{{hello}}</p>
   </div>
 </template>
 
 <script>
   export default {
-    name: 'HelloWorld',
+    name: 'RSetNew',
     data () {
       return {
-
+        goodpsda: false,
+        u_name:'',
+        u_password:'',
+        hello:''
+      }
+    },
+    methods:{
+      Paswo:function(){
+        var item=$("input")[1];
+        var reg=/^[a-zA-Z0-9]{4,10}$/;
+        if(reg.test(item)==false){
+          this.goodpsda=!this.goodpsda;
+        }else {
+          this.goodpsda = false;
+        }
+      },
+     Nameu :function(){
+      var that=this;
+      $.ajax({
+        url: 'http://h5h5h5.free.idcfengye.com/user/queryByName.action',
+        data:{u_name:this.u_name},
+        type: 'post',
+        dataType: 'json',
+        xhrFields: {
+          withCredentials: true   //前端设置是否带cookie
+        },
+        crossDomain: true,
+        success: function (list) {
+          var hell=JSON.parse(JSON.stringify(list));
+          if(hell.messages=="success"){
+          }else{
+            that.hello="用户名已存在，请重新输入";
+          }
+        },
+        error: function () {
+        }
+      })
+    },
+      Fin :function(){
+        var that = this;
+        $.ajax({
+          url: 'http://h5h5h5.free.idcfengye.com/user/register.action',
+          data:{u_name:this.u_name,u_password:this.u_password},
+          type: 'post',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true   //前端设置是否带cookie
+          },
+          crossDomain: true,
+          success: function (list) {
+            var helll=JSON.parse(JSON.stringify(list));
+            if(helll.message=="success"){
+              console.log(helll.messages);
+              that.$router.push({path:'/Login'});
+            }else{
+              that.hello = helll.message;
+            }
+          },
+          error: function () {
+            that.hello="验证码输入错误";
+          }
+        })
       }
     }
   }
@@ -44,6 +107,12 @@
     left:0.2rem;
     top:0.1rem;
     font-size: 0.3rem;}
+  .goodpsd{
+    width:80%;
+    margin:0.2rem auto;
+    font-size: 0.4rem;
+    color:red;
+  }
   .r-write {
     width:80%;
     font-size: 0.36rem;
@@ -68,7 +137,9 @@
     justify-content: space-between;
     padding-top:0.3rem;
   }
-  .setingnpwd {  width:80%;
+  .setingnpwd {
+    display: block;
+    width:80%;
     height:0.9rem;
     margin:0.8rem auto;
     text-align:center;

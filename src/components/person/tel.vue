@@ -4,16 +4,55 @@
     <router-link class="st1" to="/setting">&#xe602;</router-link>
     <h2>电话号码</h2>
   </div>
-  <form action="">
-  <input type="text" class="lp">
-    <input type="submit" value="保存" class="lp1">
-  </form>
+
+  <input type="text" class="lp" v-model="phoneNum" @blur="fui">
+    <button class="lp1" @click="ttj">保存</button>
+
+
 </div>
 </template>
 
 <script>
     export default {
-        name: "tel"
+      name: "tel",
+      data(){
+        return{
+          phoneNum: this.$route.query.num,
+
+        }
+      },
+
+      methods: {
+        fui(){
+          var ePattern = /^1[34578]\d{9}$/;
+          if (this.phoneNum == "" || !ePattern.test(this.phoneNum)){
+            alert("出错");
+         }
+        },
+        ttj(){
+          var that = this;
+          $.ajax({
+            url: 'http://h5h5h5.free.idcfengye.com/user/updateMyInfo.action',
+            type: 'post',
+            dataType: 'json',
+            xhrFields: {
+              withCredentials: true    // 前端设置是否带cookie
+            },
+            data:{
+              userInfo:"u_phone:"+this.phoneNum,
+            },
+            crossDomain: true,
+            success: function (goods) {
+              console.log(goods);
+              that.ssg = JSON.parse(JSON.stringify(goods));
+            },
+            error: function () {
+              console.log("出错");
+            }
+          })
+        }
+
+      }
     }
 </script>
 

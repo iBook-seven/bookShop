@@ -2,63 +2,131 @@
   <ul class="collect">
     <div class="header1">
       <router-link class="st1" to="/person">&#xe602;</router-link>
-      <h2>收藏商品</h2>
+      <h2 >收藏商品</h2>
     </div>
+    <!--<form action="" >-->
+
     <li class="part1 clearfix" v-for="(u,index) in jpgList">
       <div class="left">
         <!--<span>{{index+1}}</span>-->
-        <img :src="u.url" width="100" height="100"/>
+        <img :src="u.b_img" width="100" height="100"/>
       </div>
       <div class="right">
-        <p>{{u.title}}</p>
+        <p class="ido">{{u.b_name}}</p>
       </div>
       <div class="lo">
-        <h5>{{u.priceNew}}</h5>
-        <h6>{{u.priceOld}}</h6>
+        <h5>现价${{u.b_price*u.b_discountPrice*0.1}}</h5>
+        <h6>原价${{u.b_price}}</h6>
+        <span class="deli" @click="del">&#xe6b4;</span>
       </div>
       <div class="ko">
-        <div class="po">总计钱数{{u.allprice}}</div>
+        <div class="po">总计钱数{{u.b_total-u.b_saleNum}}</div>
 
       </div>
     </li>
+    <!--</form>-->
   </ul>
+
 </template>
 
 <script>
   export default {
     name: "collect",
-    data(){
-      return{
-        jpgList:[
-          {url:require('../../assets/img/1.jpg'),
-            title:'中国历史',
-            author:'匿名',
-            priceNew:'￥40.80',
-            priceOld:'￥45.00',
-            allprice:'￥26.60',
-          },
-          {url:require('../../assets/img/2.jpg'),
-            title:'解忧杂货铺',
-            author:'东野圭吾',
-            priceNew:'￥30.90',
-            priceOld:'￥34.00',
-            allprice:'￥26.60',
-            },
-          {url:require('../../assets/img/3.jpg'),
-            title:'我不',
-            author:'大冰',
-            priceNew:'￥26.60',
-            priceOld:'￥28.00',
-            allprice:'￥26.60',
 
-          }
-        ]
+    data() {
+      return {
+          jpgList:[],
+
+       /* jpgList: [{
+          "b_name": "追风筝的人",
+          "b_discountPrice": 5.0,
+          "b_price": 36.0,
+          "b_total": 3000,
+          "b_description": "为你，千千万万遍！快乐大本营高圆圆感动推荐，朗读者张一山深情朗读，窦靖童创作灵感的来源，奥巴马送给女儿的新年礼物",
+          "b_id": "0917d2bf-5131-4f9f-8b97-9a269df52f60",
+          "b_img": "http://pcgbf3gld.bkt.clouddn.com/book11.jpg",
+          "b_saleNum": 25,
+
+        },
+          {
+            "b_name": "现代操作系统(原书第3版)",
+            "b_discountPrice": 7.58,
+            "b_price": 89.0,
+            "b_total": 2000,
+            "b_description": "操作系统经典教材全新升级，与时俱进呈现当代操作系统的基础理论与研究动态",
+            "b_id": "24c8681f-cf92-415b-aa90-a2d32341f70a",
+            "b_img": "http://pcgbf3gld.bkt.clouddn.com/book16.jpg",
+            "b_saleNum": 21,
+
+          }]
+*/
       }
-    }
+    },
+    mounted: function () {
+      this.show();
+    },
+    methods: {
+      del(index){
+        var that = this;
+        var listName = this.jpgList.splice(index,1)[0].b_id;
+        // console.log(listName);
+        $.ajax({
+          url: 'http://h5h5h5.free.idcfengye.com/collection/delCollection.action',
+          type: 'post',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true    // 前端设置是否带cookie
+          },
+          data:{
+            b_id: listName
+          },
+          crossDomain: true,
+        })
+      },
+      show() {
+        var that = this;
+        $.ajax({
+          url: 'http://h5h5h5.free.idcfengye.com/collection/displayCollection.action',
+          type: 'post',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true    // 前端设置是否带cookie
+          },
+          crossDomain: true,
+          success: function (goods) {
+            console.log(goods);
+            that.jpgList = JSON.parse(JSON.stringify(goods));
+          },
+          error: function () {
+            console.log("出错");
+          }
+
+        })
+
+      }
+    },
+
+
   }
+
 </script>
 
 <style scoped>
+  .ido{
+    padding-top:0.5rem;
+    width: 2.8rem;
+    overflow: hidden;
+    height:1rem;
+    float: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .deli{
+    margin-top: 0.2rem;
+    font-family: iconfont;
+    font-size: 0.5rem;
+    color:#009a61;
+  }
   .header1{
 
     width:100%;
@@ -110,13 +178,7 @@
     height: 2.5rem;
     margin-right: 1.5rem;
   }
-  .right{
-    float: left;
-    position: relative;
-    line-height: 0.2rem;
-    padding-top:0.1rem;
-    padding-bottom: 0.1rem;
-  }
+
   .part1 img{
     margin-top: 0.2rem;
     margin-left: 0.2rem;
@@ -133,10 +195,15 @@
     display: flex;
     flex-grow: 2;
 
-    margin:1rem auto;
+    float: left;
+    position: relative;
+
+    padding-top:0.1rem;
+    padding-bottom: 0.1rem;
+
   }
   .lo{
-    margin-top: 1rem;
+    margin-top: 0.5rem;
     float: right;
     display: flex;
     flex-direction: column;

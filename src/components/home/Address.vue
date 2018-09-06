@@ -1,21 +1,25 @@
 <template>
     <div class="wrap">
       <div class="title">
-        <router-link to="/home"><span class="return">&#xe602;</span></router-link>
+        <router-link to="/setting"><span class="return">&#xe602;</span></router-link>
         <h2>我的地址薄</h2>
       </div>
       <ul>
-        <li v-for="item in addressList">
-          <span>{{item.userName}}</span>
-          <span>{{item.tel}}</span>
-          <p>{{item.address + item.addressDetail}}</p>
-          <div class="clearfix"><i class="icon icon1" :class="{active: isActive}"
-                                   @click="isActive=!isActive"></i>
-            <span @click="isActive=!isActive">设为默认</span>
+        <li v-for="(item,index) in addressList">
+          <span>{{item.a_consignee}}</span>
+          <span>{{item.a_phone}}</span>
+          <p>{{item.a_address}}</p>
+          <div class="clearfix">
+            <i class="icon icon1" :class="{active: item.a_default}"
+                                   @click="change(item)"></i>
+            <span @click="change(item)">设为默认</span>
           </div>
           <div>
-            <router-link to="/EditAddress"><i class="icon">&#xe649;</i><span>编辑</span></router-link>
-            <i class="icon">&#xe6b4;</i><span>删除</span>
+            <!--<router-link to="/EditAddress">-->
+            <i class="icon">&#xe649;</i><span @click="edit(item)">编辑</span>
+            <!--</router-link>-->
+            <i class="icon" @click="del(item,index)">&#xe6b4;</i>
+            <span @click="del(item,index)">删除</span>
           </div>
         </li>
       </ul>
@@ -25,14 +29,97 @@
 
 <script>
     export default {
-        name: "Address",
-      data(){
-          return{
-            isActive: false,
-            addressList:[
-              { userName: '浩浩' ,tel: '18829488562' ,  address: '陕西省，西安市，蓝田县 ', addressDetail: '三里镇李后村四组'}
-            ]
-          }
+      name: "Address",
+      data() {
+        return {
+          addressList: [
+            // {
+            //   a_consignee: '浩浩',
+            //   a_phone: '18829488562',
+            //   a_address: '陕西省,西安市,蓝田区,西安邮电区学校',
+            // }
+          ],
+          status: this.$route.query.status,
+        }
+      },
+      mounted: function () {
+        this.show();
+      },
+      methods: {
+        del(item,index){
+          var that = this;
+          this.addressList.splice(index,1);
+          $.ajax({
+            url: 'http://localhost:8080/address/del.action',
+            type: 'post',
+            dataType: 'json',
+            data: {a_id: item.a_id},
+            xhrFields: {
+              withCredentials: true   // 前端设置是否带cookie
+            },
+            crossDomain: true,
+            success: function (goods) {
+              // that.addressList = JSON.parse(JSON.stringify(goods));
+              // console.log(goods);
+            },
+            error: function () {
+              console.log("出错了！");
+            }
+          })
+        },
+        edit(item){
+          this.$router.push({path:'/EditAddress',
+            query:{
+              id: item.a_id,
+              userName: item.a_consignee,
+              tel: item.a_phone,
+              address: item.a_address,
+              default: item.a_default
+          }});
+        },
+        change(item){
+          this.addressList.forEach(i=>{
+            i.a_default = 0;
+          });
+          item.a_default=1;
+          var that = this;
+          $.ajax({
+            url: 'http://localhost:8080/address/update.action',
+            type: 'post',
+            dataType: 'json',
+            data: {a_id: item.a_id,a_default: 1},
+            xhrFields: {
+              withCredentials: true   // 前端设置是否带cookie
+            },
+            crossDomain: true,
+            success: function (goods) {
+              that.addressList = JSON.parse(JSON.stringify(goods));
+              console.log(goods);
+            },
+            error: function () {
+              console.log("出错了！");
+            }
+          })
+        },
+        show() {
+          var that = this;
+          $.ajax({
+            url: 'http://localhost:8080/address/query.action',
+            type: 'post',
+            dataType: 'json',
+            xhrFields: {
+              withCredentials: true   // 前端设置是否带cookie
+            },
+            crossDomain: true,
+            success: function (goods) {
+              that.addressList = JSON.parse(JSON.stringify(goods));
+              console.log(goods);
+            },
+            error: function () {
+              console.log("出错了！");
+            }
+          })
+        }
       }
     }
 </script>
@@ -58,7 +145,7 @@
     letter-spacing: 1px;
   }
   ul{
-
+      margin-bottom: 1rem;
   }
   ul li{
     border-bottom: 0.2rem solid #f5f5f5;

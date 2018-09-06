@@ -5,28 +5,30 @@
           <h2>图书畅销榜</h2>
         </div>
         <ul class="part">
-          <li class="part1 clearfix" v-for="(u,index) in jpgList">
+          <li class="part1 clearfix" v-for="(u,index) in jpgList" @click="goto(u)">
           <div class="left">
               <span>{{index+1}}</span>
-              <img :src="u.url"/>
+              <img :src="u.b_img"/>
           </div>
           <div class="right">
-            <h4>{{u.title}}</h4>
-            <p>作者：{{u.author}}</p>
-            <p>出版社：{{u.press}}</p>
+            <h4>{{u.b_category}}</h4>
+            <p>作者：{{u.b_author}}</p>
+            <p>出版社：{{u.b_publish}}</p>
             <p class="circle">
               <span>当当自营</span>
               <span>满减</span>
             </p>
             <div class="price">
-              <h4>{{u.priceNew}}</h4>
-              <p>{{u.priceOld}}</p>
+              <h4>￥{{((u.b_discountPrice/10)*u.b_price).toFixed(2)}}</h4>
+              <p>￥{{u.b_price}}</p>
+              <span>销量：{{u.b_saleNum}}</span>
             </div>
             <p class="star"><span>&#xe60b;</span><span>&#xe60b;</span><span>&#xe60b;</span><span>&#xe60b;</span><span>&#xe60b;</span></p>
             <span class="span1">&#xe73e;</span>
           </div>
           </li>
         </ul>
+       <button type="button" @click="toTop" class="btn">&#xe62b;</button>
      </div>
 </template>
 
@@ -35,28 +37,43 @@
         name: "bang",
       data(){
           return{
-            jpgList:[
-              {url:require('../../assets/img/1.jpg'),
-                title:'中国历史',
-                author:'匿名',
-                press:'人民邮电出版社',
-                priceNew:'￥40.80',
-                priceOld:'￥45.00',},
-              {url:require('../../assets/img/2.jpg'),
-                title:'解忧杂货铺',
-                author:'东野圭吾',
-                press:'人民出版社',
-                priceNew:'￥30.90',
-                priceOld:'￥34.00',},
-              {url:require('../../assets/img/3.jpg'),
-                title:'我不',
-                author:'大冰',
-                press:'作家出版社',
-                priceNew:'￥26.60',
-                priceOld:'￥28.00',}
-            ]
+            jpgList: this.$route.query.list,
           }
-      }
+        },
+      mounted:function(){
+        // this.show();
+         $(window).scroll(function (){
+         $("button").css("display", $(window).scrollTop()>=100?"block":"none");
+        });
+      },
+      methods:{
+        goto(item){
+          this.$router.push({path: '/ProductDetails',query:{id: item.b_id}});
+        },
+        toTop(){
+            $(window).scrollTop(0);
+          },
+        show(){
+          var that = this;
+          $.ajax({
+            url:'http://h5h5h5.free.idcfengye.com/bookInformation/hotSaleController.action',
+            type: 'post',
+            dataType: 'json',
+            xhrFields: {
+              withCredentials: true
+            },
+            crossDomain: true,
+            success: function (goods) {
+              that.jpgList = JSON.parse(JSON.stringify(goods));
+              console.log(that.jpgList);
+
+            },
+            error: function () {
+              console.log("出错了！");
+            }
+          })
+        },
+      },
     }
 </script>
 
@@ -93,7 +110,7 @@
     position: absolute;
     left: 0;
     top: 0;
-    width: 0.3rem;
+    width: 0.35rem;
   }
   .left{
     float: left;
@@ -154,9 +171,9 @@
     font-size:0.3rem;
 
   }
-
-
-
-
-
+  button{width:40px; height:40px; font-size:25px;border-radius: 50%;
+    border:1px #009a61 solid;font-family: "iconfont";
+    position:fixed; right:10px;display:none; bottom:10px;
+    color:#009a61;background-color: snow;
+    text-align: center;}
 </style>

@@ -5,25 +5,27 @@
       <router-link to="/Login"><a href="" class="login-login">账号密码登录</a></router-link>
       <router-link to="/Note"><a href="">短信快捷登陆</a></router-link>
     </div>
-    <form action="#" method="post" name="form">
+    <form action="http://ybt.free.ngrok.cc/user/shiroLogin.action" method="post" name="form">
       <div class="login-user">
         <span class="iconfont">&#xe658;</span>
-        <input type="text" name="tel" placeholder="请输入手机号/邮箱/昵称"/>
+        <input type="text" name="u_name" placeholder="请输入手机号" @blur="GetUserP" @focus="ChaClo" v-model="u_name"/>
         <span class="iconfont login-user-clear">&#xe605;</span>
         <span class="iconfont login-user-more">&#xe695;</span>
       </div>
       <div class="login-password">
         <span class="iconfont">&#xe604;</span>
-        <input type="text" name="password" placeholder="请输入密码"/>
+        <input type="password" name="u_password" placeholder="请输入密码" v-model="u_password"/>
         <span class="iconfont login-password-close">&#xe625;</span>
         <span class="iconfont login-password-open">&#xe901;</span>
       </div>
-      <router-link to=""><a href="" class="loaging">登录</a></router-link><!--成功则链接主页-->
+      <router-link to=""><input type="submit" class="loaging" value="登录" @click="GetLogin"/></router-link><!--成功则链接主页-->
     </form>
     <div class="login-link">
       <router-link to="/ForgitPwd"><a href="" class="forget-parseword">忘记密码？</a></router-link><!--点击链接忘记密码-->
       <router-link to="/Register"><a href="" class="now-enroll">立即注册</a></router-link><!--点击链接注册页-->
     </div>
+    <p v-show="phoneAlert">请输入正确的手机号</p>
+    <p>{{hello}}</p>
     <div class="login-other">
       <span class="iconfont login-other-qq">&#xe65e;</span>
       <span class="iconfont login-other-zfb">&#xe64a;</span>
@@ -39,10 +41,57 @@
     name: 'Login',
     data () {
       return {
-
+        phoneAlert:false,
+        emailAlert:false,
+        u_name:'',
+        u_password:'',
+        hello:'',
+      }
+    },
+    methods: {
+      show() {
+        var that = this;
+        $.ajax({
+          url: 'http://h5h5h5.free.idcfengye.com/user/shiroLogin.action',
+          data:{u_name:this.u_name,u_password:this.u_password},
+          type: 'post',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true   //前端设置是否带cookie
+          },
+          crossDomain: true,
+          success: function (list) {
+            var hel=JSON.parse(JSON.stringify(list));
+            console.log(list);
+            if(hel.message=="success"){
+              console.log(list);
+              that.$router.push({path: '/person',query:{u_name:that.u_name}});
+            }else{
+              that.hello=hel.message;
+            }
+          },
+          error: function () {
+            // this.hello="用户名密码输入错误！";
+          }
+        })
+      },
+      GetUserP:function(){
+        var emph=$("input")[0].value;
+        var regMobile=/^1\d{10}$/;
+        var regEm=/^\w+@\w+(\.[a-zA-Z]{2,3}){1,2}$/;
+        if(regEm.test(emph)==false && regMobile.test(emph)==false){
+          this.phoneAlert=!this.phoneAlert;
+        }
+        this.phoneAlert=this.phoneAlert;
+      },
+      ChaClo:function(){
+        $("input")[2].style.backgroundColor='#f3344a';
+      },
+      GetLogin:function(){
+        this.show();
+      }
       }
     }
-  }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
@@ -54,6 +103,10 @@
     font-family: Arial, Verdana, Tahoma, "微软雅黑", "黑体";}
   a { text-decoration: none;
     display:block;}
+    #login p { width:80%;
+      margin:0.2rem auto;
+    font-size: 0.4rem;
+    color:red;}
   .header { position:absolute;
     left:0.2rem;
     top:0.1rem;
@@ -80,6 +133,9 @@
     font-size: 0.22rem;
     line-height:1rem;
   }
+  form input:focus{
+    outline: none;
+  }
   form div {  width:80%;
     height:1.3rem;
     line-height:1.3rem;
@@ -92,7 +148,9 @@
     justify-content: space-between;
     padding-top:0.3rem;
   }
-  .loaging {  width:80%;
+  .loaging {
+    display:block;
+    width:80%;
     height:0.9rem;
     margin:0.36rem auto;
     text-align:center;

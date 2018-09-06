@@ -8,21 +8,84 @@
       <span></span>
     </p>
     <div class="get">
-      <div></div>
-      <div></div>
-      <div></div>
-      <div></div>
-      <div></div>
-      <div></div>
+      <input type="text" maxlength="1"/>
+      <input type="text" maxlength="1"/>
+      <input type="text" maxlength="1"/>
+      <input type="text" maxlength="1"/>
+      <input type="text" maxlength="1"/>
+      <input type="text" maxlength="1"/>
     </div>
-    <router-link to="/RSetNew"><a href="" class="nexting">下一步</a></router-link>
+    <!--<form action="http://ybt.free.idcfengye.com/user/register_phone.action">-->
+      <input type="button" class="nexting" @click="Goon" value="下一步"/>
+    <!--</form>-->
+    <p>{{hello}}</p>
     <a class="safety-problem">收不到验证码？</a>
   </div>
 </template>
 
 <script>
   export default {
-    name: "NoteGet.vue"
+    name: "RNoteGet",
+    data(){
+      return {
+        tel:'',
+        message:'',
+        hello:''
+      }
+    },
+    mounted() {
+      this.Next();
+    },
+    methods:{
+      Next: function () {
+        var txts = $("input");
+        for (var i = 0; i < txts.length; i++) {
+          var t = txts[i];
+          t.index = i;
+          t.setAttribute("readonly", true);
+          t.onkeyup = function () {
+            this.value = this.value.replace(/^(.).*$/, '$1');
+            var next = this.index + 1;
+            if (next > txts.length - 1) return;
+            txts[next].removeAttribute("readonly");
+            txts[next].focus();
+          }
+        }
+        txts[0].removeAttribute("readonly");
+      },
+      Goon :function(){
+        var inputall=$(".get input");
+        var arr=[];
+        var that=this;
+        for(var i=0;i<inputall.length;i++){
+          arr.push(inputall[i].value);
+        }
+        this.message=arr.join("");
+        console.log(this.message);
+        $.ajax({
+          url: 'http://h5h5h5.free.idcfengye.com/user/register_phone.action',
+          data:{message: this.message},
+          type: 'post',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true   //前端设置是否带cookie
+          },
+          crossDomain: true,
+          success: function (list) {
+            var helll=JSON.parse(JSON.stringify(list));
+            if(helll.message=="success"){
+              console.log(helll.messages);
+              that.$router.push({path:'/RSetNew'});
+            }else{
+              that.hello = helll.message;
+            }
+          },
+          error: function () {
+            that.hello="验证码输入错误";
+          }
+        })
+      }
+    }
   }
 </script>
 
@@ -54,6 +117,7 @@
     color:#ccc;
   }
   .noteget-p span {
+    color:#f3344a;
     border:0.01rem solid #ccc;
     border-radius:0.05rem;
     margin-left:0.2rem;
@@ -67,12 +131,16 @@
     margin:0 auto;
     padding:0.5rem 0 0 0;
   }
-  .get div {
+  .get input {
+    display: block;
+    border:none;
     width:0.9rem;
     height:0.9rem;
     border-bottom: 0.01rem solid #ccc;
   }
-  .nexting {  width:80%;
+  .nexting {
+    display:block;
+    width:80%;
     height:0.9rem;
     margin:0.84rem auto;
     text-align:center;

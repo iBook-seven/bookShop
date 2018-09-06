@@ -7,10 +7,10 @@
       <p>订单结算</p>
     </div>
     <div class="address">
-      <span>姓名</span>
-      <span>15529343236</span>
-      <p><span>&#xe607;</span>陕西省西安市长安区你猜在哪</p>
-      <div class="bg">&#xe6e0;</div>
+      <span>{{list.u_name}}</span>
+      <span>{{list.u_phone}}</span>
+      <p><span>&#xe607;</span>{{list.address}}</p>
+      <router-link to="/setting"><div class="bg">&#xe6e0;</div></router-link>
     </div>
     <div class="button"></div>
     <div class="bgc"></div>
@@ -20,20 +20,20 @@
     </div>
     <div class="goods">
       <div class="left">
-        <img src="../../assets/img/1.jpg" alt="">
-        <img src="../../assets/img/2.jpg" alt="">
+        <img :src="list.b_img" alt="">
+        <img :src="list.b_img" alt="">
       </div>
       <div class="right">
-        <span>￥：22.27</span>
-        <p>共三件，免运费</p>
+        <span>￥：{{list.o_price}}</span>
+        <p>共{{list.buyNumber}}件，免运费</p>
       </div>
-      <div class="bg-one">&#xe6e0;</div>
+      <router-link to="/ProductDetails"><div class="bg-one">&#xe6e0;</div></router-link>
     </div>
     <div class="send">
       <span>配送方式</span>
-      <span class="one">亚马逊快递(送货时间不限)</span>
+      <span class="one">快递(送货时间不限)</span>
       <p class="on">今日<span>15:25</span>前付款</p>
-      <p class="ono">预计<span>08</span>月<span>07日</span><span>(周日)</span>送达</p>
+      <p class="ono">预计<span>{{list.month}}</span>月<span>{{list.day}}日</span><span></span>送达</p>
       <div class="bg-two">&#xe6e0;</div>
     </div>
     <div class="give">
@@ -66,24 +66,124 @@
     </div>
     <div class="end">
       <span>商品金额：</span>
-      <span>￥22.7</span><br>
-     <p><span>运费</span><span>￥0.00</span></p>
+      <span>{{list.o_price}}</span><br>
+     <p><spo_an>运费</spo_an><span>￥0.00</span></p>
     </div>
     <div class="finally">
-      <p><span>实付:&nbsp</span><span>￥22.7</span></p>
-      <div class="btn">
+      <p><span>实付:&nbsp</span><span>{{list.zprice}}</span></p>
+      <div class="btn" @click="go">
         <span>去支付</span>
       </div>
+    </div>
+    <div class="key" v-show="flag">
+      <div class="password">
+        <div>{{star}}</div>
+      </div>
+      <ul>
+        <li v-for="(i,index) in 9" @click="add(index)">{{i}}</li>
+        <li @click="del">回退</li>
+        <li @click="add(-1)">0</li>
+        <li @click="confirm()">确认</li>
+      </ul>
     </div>
   </div>
 </template>
 
 <script>
   export default {
-    name: "pay"
-  }
+    name: "pay",
+    data(){
+      return{
+        list:[
+          {b_id:'4f71803c-ff9b-4bb8-9860-3560110f426f'}
+        ],
+        str: '',
+        num: 0,
+        star:'',
+        flag:false
+      }
+    },
+    mounted(){
+      let that = this;
+     setTimeout(function(){
+       that.finally();
+     },1000)
+    },
+    methods:{
+      add(index){
+        this.num++;
+        if(this.num<=6){
+          index++;
+          this.str += index;
+          this.star +='*';
+        }
+      },
+      finally(){
+        let that = this;
+        $.ajax({
+          url:'http://h5h5h5.free.idcfengye.com/alipay/putResult.action',
+          type: 'post',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true    // 前端设置是否带cookie
+          },
+          crossDomain: true,
+          success: function (goods) {
+            console.log(goods);
+            that.list = JSON.parse(JSON.stringify(goods));
+          },
+          error: function () {
+            console.log("出错");
+          }
+        })
+      },
+      del(){
+        // this.str.length--;
+        this.str = this.str.substring((this.str.length-1),0);
+        this.star = this.star.substring((this.star.length-1),0);
+      },
+      confirm(){
+        if(this.str.length == 6 && this.star.length == 6){
+          alert("支付成功");
+          this.$router.push({path:'/ssh'});
+        }else{
+          alert("请正确输入密码");
+          console.log(111)
+        }
+        let str = '';
+        this.list.forEach(item =>{
+          str+=item.b_id+'='
+        });
+        console.log(str);
+        let that = this;
+        $.ajax({
+          url:'http://h5h5h5.free.idcfengye.com/order/updateStatus0_1.action',
+          data:{b_id:str},
+          type: 'post',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true    // 前端设置是否带cookie
+          },
+          crossDomain: true,
+          success: function (goods) {
+            console.log(goods);
+            that.list = JSON.parse(JSON.stringify(goods));
+          },
+          error: function () {
+            console.log("出错");
+          }
+        })
+      },
+      go(){
+        this.flag=true;
+      }
+      }
+    }
 </script>
 <style scoped>
+  .apply{
+    position: relative;
+  }
   .back {
     width: 100%;
     height: 1.06rem;
@@ -223,7 +323,7 @@
   }
 
   .one {
-    margin-left: 2.3rem;
+    margin-left: 3rem;
   }
 
   .on {
@@ -232,7 +332,7 @@
   }
 
   .ono {
-    margin-left: 3.6rem;
+    margin-left: 4.1rem;
     line-height: 0.42rem;
   }
 
@@ -397,6 +497,9 @@
     font-size: 0.25rem;
     padding-top: 0.2rem;
   }
+  .end p{
+    margin-left: 0.3rem;
+  }
   .end span:nth-child(1){
     margin-left: 0.3rem;
     line-height: 0.48rem;
@@ -433,6 +536,41 @@
   .btn span{
     color: white;
   }
-
+  .key{
+    position: absolute;
+    top: 8.8rem;
+    width: 100%;
+    background-color: #009a61;
+  }
+  .key ul{
+    display: flex;
+    flex-wrap: wrap;
+    flex: 3;
+    border: 1px solid #009a61;
+  }
+  .key li{
+    width:33.3333333%;
+    height: 1rem;
+    text-align: center;
+    line-height: 1rem;
+    font-size: 0.5rem;
+  }
+  .key ul li:hover{
+    background-color:gray;
+  }
+  .password{
+    display: flex;
+    color: white;
+  }
+  .password div{
+    text-align: center;
+    line-height: 1rem;
+    font-size: 0.5rem;
+    width:100%;
+    height: 1rem;
+    border: 1px solid #009a61;
+    letter-spacing: 0.9rem;
+    padding-left:0.7rem;
+  }
 </style>
 

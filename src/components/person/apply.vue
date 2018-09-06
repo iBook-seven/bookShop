@@ -13,20 +13,23 @@
     </ul>
     <li class="part1 clearfix" v-for="(u,index) in jpgList">
       <div class="left">
-        <img :src="u.url" width="100" height="100"/>
+        <img :src="u.b_img" width="100" height="100"/>
       </div>
       <div class="right">
-        <p>{{u.title}}</p>
+        <p class="ido">{{u.b_description}}</p>
       </div>
+
       <div class="lo">
-        <h5>{{u.priceNew}}</h5>
-        <h6>{{u.priceOld}}</h6>
+        <h5>现价{{u.b_price*u.b_discountPrice*0.1}}</h5>
+        <h6>原价{{u.b_price}}</h6>
+        <span class="deli" @click="aj1(index)">&#xe6b4;</span>
       </div>
       <div class="ko">
-        <div class="po">总计钱数{{u.allprice}}</div>
+        <div>数量{{u.number}}</div>
+        <div class="po">总计钱数{{(u.b_price*u.b_discountPrice*u.number*0.1).toFixed(2)}}</div>
         <br>
-        <div class="del">{{u.ke}}</div>
-
+        <router-link tag="div"  to="pay" class="del" @click="">支付订单</router-link>
+      <!--  <div @click="pay(u)" class="del">支付订单</div>-->
       </div>
     </li>
   </ul>
@@ -37,39 +40,114 @@
     name: "apply",
     data(){
       return{
-        jpgList:[
-          {url:require('../../assets/img/1.jpg'),
-            title:'中国历史',
-            author:'匿名',
-            priceNew:'￥40.80',
-            priceOld:'￥45.00',
-            allprice:'￥26.60',
-            ke:'支付订单'},
+        jpgList: [],
 
-          {url:require('../../assets/img/2.jpg'),
-            title:'解忧杂货铺',
-            author:'东野圭吾',
-            priceNew:'￥30.90',
-            priceOld:'￥34.00',
-            allprice:'￥26.60',
-            ke:'支付订单'},
-          {url:require('../../assets/img/3.jpg'),
-            title:'我不',
-            author:'大冰',
-            priceNew:'￥26.60',
-            priceOld:'￥28.00',
-            allprice:'￥26.60',
-            ke:'支付订单'
-          }
-        ]
       }
-    }
+    },
+    mounted(){
+      this.aj();
+    },
+    methods:{
+     /* pay(item){
+        $.ajax({
+          url: 'http://wzh123.free.idcfengye.com/order/updateStatus0_1.action',
+          type: 'post',
+          dataType: 'json',
+          data:{ b_id: item.b_id},
+          xhrFields: {
+            withCredentials: true    // 前端设置是否带cookie
+          },
+          crossDomain: true,
+          success: function () {
+            console.log('success');
+          },
+          error: function () {
+            console.log("出错");
+          }
+        });
+        this.$router.push({path:'/pay'});
+
+      },*/
+      aj(){
+        var that = this;
+        $.ajax({
+          url: 'http://h5h5h5.free.idcfengye.com/showOrder/showOrder0.action',
+          type: 'post',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true    // 前端设置是否带cookie
+          },
+
+          crossDomain: true,
+          success: function (goods) {
+            console.log(goods);
+            that.jpgList = JSON.parse(JSON.stringify(goods));
+          },
+          error: function () {
+            console.log("出错");
+          }
+        })
+      },
+      aj1(index){
+        var that = this;
+        var listName = this.jpgList.splice(index,1)[0].b_id;
+        var num1= this.jpgList.splice(index,1)[0].number;
+        // console.log(listName);
+        $.ajax({
+          url: 'http://h5h5h5.free.idcfengye.com/order/delOrder.action',
+          type: 'post',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true    // 前端设置是否带cookie
+          },
+          data:{
+              /*b_id: listName,*/
+
+            bid_bnum: listName+"="+num1,
+          },
+          crossDomain: true,
+         /* success: function (goods) {
+            console.log(goods);
+            that.jpgList = JSON.parse(JSON.stringify(goods));
+          },
+          error: function () {
+            console.log("出错");
+          }*/
+        })
+      }
+    },
+
   }
 </script>
 
 <style scoped>
+  .ido{
+    padding-top:0.5rem ;
+    width: 2.8rem;
+    overflow: hidden;
+    height:1rem;
+    float: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .deli{
+  font-family: iconfont;
+    font-size: 0.4rem;
+    color:#009a61;
+  }
   .router-link-active{
     color: #009a61;
+  }
+  .ido{
+
+    width: 2.8rem;
+    overflow: hidden;
+    height:1rem;
+    float: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
   }
   .header1{
 
@@ -132,13 +210,9 @@
     height: 2.5rem;
     margin-right: 1.5rem;
   }
-  .right{
-    float: left;
-    position: relative;
-    line-height: 0.2rem;
-    padding-top:0.1rem;
-    padding-bottom: 0.1rem;
-  }
+
+
+
   .right h2{
     position: absolute;
     margin-left: 40%;
@@ -160,15 +234,21 @@
     display: flex;
     flex-grow: 2;
 
-    margin:1rem auto;
+    float: left;
+    position: relative;
+
+    padding-top:0.1rem;
+    padding-bottom: 0.1rem;
+
   }
   .lo{
-    margin-top: 1rem;
+    margin-top: 0.2rem;
     float: right;
     display: flex;
     flex-direction: column;
     margin-right: 0.5rem;
-  }h5{
+  }
+  h5{
      font-size: 0.4rem;
      margin-bottom: 0.3rem;
    }

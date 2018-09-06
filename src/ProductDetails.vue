@@ -1,68 +1,66 @@
 <template>
   <div id="productdetails">
     <header>
-      <span class="iconfont">&#xe615;</span>
-      <a>商品</a>
-      <a>评论</a>
-      <a>详情</a>
-      <a>推荐</a>
+      <span class="iconfont" @click="back">&#xe615;</span>
+      <p @click="GoToO">商品</p>
+      <p @click="GoToT">评论</p>
+      <p @click="GoToTh">详情</p>
+      <p @click="GoToF">推荐</p>
       <span class="iconfont">&#xe60e;</span>
       <span class="iconfont">&#xe66f;</span>
     </header>
     <main>
-      <div class="all">
-        <div class="p-box">
-          <ul class="clearfix">
-            <li v-for="u in kiterunnerO"><img :src="u.url"/></li>
-            <!--<ol></ol>-->
-            <!--<div id="arr">-->
-              <!--<span id="left"><</span>-->
-              <!--<span id="right">></span>-->
-            <!--</div>-->
-          </ul>
-        </div>
+      <div class="pic">
+        <mt-swipe :auto="2000">
+          <mt-swipe-item v-for="item in kiterunner[0].bookImgs" :key="item.bi_id">
+            <a rel="external nofollow" >
+              <img :src="item.bi_url" class="img"/>
+              <span class="desc"></span>
+            </a>
+          </mt-swipe-item>
+        </mt-swipe>
       </div>
       <p class="p-d-name">
-        <span>{{kitrunner.ddzy}}</span>
-        {{kitrunner.bookname}}
+        <span>当当自营</span>
+        {{kiterunner[0].b_name}}
       </p>
-      <p class="short">{{kitrunner.short}}</p>
-      <p class="sale">{{kitrunner.sale}}</p>
-      <h2 class="price">{{kitrunner.price}}
-        <span>{{kitrunner.discont}}</span>
+      <p class="short">{{kiterunner[0].b_description}}</p>
+      <p class="sale">{{kiterunner[0].sale}}</p>
+      <h2 class="price">￥{{kiterunner[0].b_price*kiterunner[0].b_discountPrice*0.1}}
+        <span>{{kiterunner[0].b_discountPrice}}折</span>
       </h2>
-      <p class="money">{{kitrunner.money}}</p>
+      <p class="money">{{kiterunner[0].b_price}}元</p>
       <div class="full-dis">
         <span class="left">满减</span>
-        <p>{{kitrunner.fullsubtraction}}</p>
+        <p>每满￥100减￥50 </p>
         <span class="iconfont right">&#xe6e0;</span>
       </div>
       <ol>
         <li class="clearfix">
           <span class="ol-left">作者</span>
-          <p>{{kitrunner.author}}</p>
+          <p>{{kiterunner[0].b_author}}</p>
           <span class="iconfont ol-rigth">&#xe6e0;</span>
         </li>
         <li class="clearfix">
           <span class="ol-left">出版</span>
-          <p>{{kitrunner.public}}</p>
+          <p>{{kiterunner[0].b_publish}}</p>
           <span class="iconfont ol-rigth">&#xe6e0;</span>
         </li>
         <li class="clearfix">
           <span class="ol-left">排名</span>
-          <p>{{kitrunner.ranking}}</p>
+          <p>当当小说榜第5名</p>
           <span class="iconfont ol-rigth">&#xe6e0;</span>
         </li>
         <li class="clearfix">
           <span class="ol-left">分类</span>
-          <p>{{kitrunner.classify}}</p>
+          <p>图书>小说>世界名著>其他地区</p>
           <span class="iconfont ol-rigth">&#xe6e0;</span>
         </li>
       </ol>
       <div class="address">
         <span class="left">送至</span>
         <div class="user">
-          <div class="three"></div>
+          <div class="three">陕西省西安市长安区西安邮电大学</div>
           <div>今天23：00前下单，预计后天送达</div>
           <div>运费5元，满49包邮</div>
         </div>
@@ -131,10 +129,9 @@
       <div class="details">
         <p>
           <a>图文详情</a>
-          <router-link to="/Public"><a>出版信息</a></router-link>
         </p>
         <ul>
-          <li v-for="u in kiterunnerT"><img :src="u.url"/></li>
+          <li v-for="u in kiterunner[0].describeImages"><img :src="u.di_url"/></li>
         </ul>
         <router-view></router-view>
       </div>
@@ -160,54 +157,70 @@
         <p>店铺</p>
       </div>
       <div class="like">
-        <p class="iconfont">&#xe6af;</p>
+        <p class="iconfont" @click="Collection" :class="{checked: flag}">&#xe6af;</p>
         <p>收藏</p>
       </div>
       <div class="car">
-        <p class="iconfont">&#xe73e;</p>
+        <router-link to="/goods"><p class="iconfont">&#xe73e;</p></router-link>
         <p>购物车</p>
       </div>
-      <router-link to="/pay"><div class="nowbuy">立即购买</div></router-link>
-      <div class="addcar">加入购物车</div>
+      <div class="nowbuy" @click="buyNow">立即购买</div>
+      <div class="addcar" @click="Addball">加入购物车</div>
+      <transition
+        @bafore-enter="beforeEnter"
+        @enter="enter"
+        @after-enter="afterEnter"
+      >
+        <div class="ball" v-show="ballshow"></div>
+      </transition>
     </footer>
   </div>
 </template>
 
 <script>
+  import { Picker } from 'mint-ui';
+  import {Swipe, SwipeItem} from 'mint-ui'
+  import 'mint-ui/lib/style.css'
+  import myaddress from '../static/address.json';
     export default {
         name: "ProductDetails",
+        components: {
+        },
         data(){
           return {
-            kitrunner :
-              {ddzy : '当当自营',
-              bookname : '追风筝的人（2018年新版）',
-              short : '（为你，千千万万遍！快乐大本营高圆圆感动推荐，朗读者张一山深情诵读，窦靖童创作灵感的来源，奥巴马送给女儿的新年礼物。）',
-              sale : '文艺品学类更多每满150减50请点',
-              price : '￥33.5',
-              discont : '9,31折',
-              money : '原价：￥36.00',
-              fullsubtraction : '每满￥100减￥50',
-              author : '美籍阿富汗作家卡勒德·胡赛尼',
-              public: '上海人民出版社于2006年出版',
-              ranking :'当当小说榜第5名',
-              classify : '图书>小说>世界名著>其他地区'
+            isShow: false,
+            ballshow:false,
+            b_id: this.$route.query.id,
+            myAddressSlots: [
+              {
+                flex: 1,
+                defaultIndex: 1,
+                values: Object.keys(myaddress), //省份数组
+                className: 'slot1',
+                textAlign: 'center'
+              }, {
+                divider: true,
+                content: '-',
+                className: 'slot2'
+              }, {
+                flex: 1,
+                values: [],
+                className: 'slot3',
+                textAlign: 'center'
+              },
+              {
+                divider: true,
+                content: '-',
+                className: 'slot4'
+              },
+              {
+                flex: 1,
+                values: [],
+                className: 'slot5',
+                textAlign: 'center'
               }
-            ,
-            kiterunnerO : [
-             {url: require('@/assets/img/p-d-1.jpg')},
-             {url: require('@/assets/img/p-d-2.jpg')},
-             {url: require('@/assets/img/p-d-3.jpg')},
-              {url: require('@/assets/img/p-d-4.jpg')},
-           ],
-            kiterunnerT: [
-              {url: require('@/assets/img/p-d-s-1.jpg')},
-              {url: require('@/assets/img/p-d-s-2.jpg')},
-              {url: require('@/assets/img/p-d-s-3.jpg')},
-              {url: require('@/assets/img/p-d-s-4.jpg')},
-              {url: require('@/assets/img/p-d-s-5.jpg')},
-              {url: require('@/assets/img/p-d-s-6.jpg')},
-              {url: require('@/assets/img/p-d-s-7.jpg')},
             ],
+            kiterunner:[],
             kiterunnerR : [
               { url: require('@/assets/img/rec-1.png'),
                 title:'浮生六记（珍藏本）',
@@ -234,12 +247,174 @@
                 price:'￥35.5',
               },
             ],
+            flag: false,
           }
-        }
+        },
+      mounted(){
+        this.show1();
+      },
+      methods: {
+        back(){
+          this.$router.go(-1);
+        },
+        Addball(){
+          this.ballshow = !this.ballshow;
+          var that=this;
+          $.ajax({
+            url:' http://localhost:8080/shopCartController/insertShopCart.action',
+            data:{b_id:this.b_id},
+            type:'post',
+            dataType:'json',
+            xhrFields:{
+              withCredentials:true   //前端设置是否带cookie
+            },
+            crossDomain:true,
+            success:function(){
+              console.log(that.b_id);
+            },
+            error:function(){
+              console.log("出错");
+            }
+          })
+        },
+        beforeEnter(el){
+          el.style.transform = 'translate(0,0)';
+        },
+        enter(el){
+          el.offsetWidth;
+          el.style.transform = 'translate(-4.5rem,0)';
+          el.style.transition = 'all 1s ease';
+          done();
+        },
+        afterEnter(el){
+          this.ballshow = !this.ballshow;
+        },
+        //根据id查找详情
+        show1(){
+          var that = this;
+          $.ajax({
+            url:'http://localhost:8080/bookInformation/selectInformation.action',
+            type:'post',
+            dataType:'json',
+            data: {b_id: this.b_id},
+            xhrFields:{
+              withCredentials:true   //前端设置是否带cookie
+            },
+            crossDomain:true,
+            success:function(list){
+              console.log(list);
+              that.kiterunner=JSON.parse(JSON.stringify(list));
+            },
+            error:function(){
+              console.log("出错");
+            }
+          })
+        },
+        Collection(){//收藏
+          this.flag=!this.flag;
+          var that=this;
+          $.ajax({
+            url:'http://localhost:8080/collection/addMyCollection.action',
+            data:{ b_id: this.b_id },
+            type:'post',
+            dataType:'json',
+            xhrFields:{
+              withCredentials:true   //前端设置是否带cookie
+            },
+            crossDomain:true,
+            success:function(){
+
+            },
+            error:function(){
+              console.log("出错");
+            }
+          })
+        },
+        //王子涵的数据
+        buyNow(){
+          var that=this;
+          $.ajax({
+            url:'http://localhost:8080/confirmOrder/addOrder.action',
+            data:{books:this.b_id+'='+'1'},
+            type:'post',
+            dataType:'json',
+            xhrFields:{
+              withCredentials:true   //前端设置是否带cookie
+            },
+            crossDomain:true,
+            success:function(){
+              console.log('success');
+            },
+            error:function(){
+              console.log("出错");
+            }
+          });
+          this.buyNow2();
+          this.$router.push({path:'/pay'});
+        },
+        //王晶晶的数据
+        buyNow2(){
+          var that=this;
+          $.ajax({
+            url:'http://localhost:8080/alipay/alipayController.action',
+            data:{total: this.b_id+'='+'1'},
+            type:'post',
+            dataType:'json',
+            xhrFields:{
+              withCredentials:true   //前端设置是否带cookie
+            },
+            crossDomain:true,
+            success:function(){
+              console.log('success');
+            },
+            error:function(){
+              console.log("出错");
+            }
+          })
+        },
+        GoToO(){
+          var TopO=$("main")[0].offsetTop+1;
+          $("html, body").animate({scrollTop:TopO+'rem'},0);
+        },
+        GoToT(){
+          var TopT=$(".comment")[0].offsetTop-0.94;
+          $("html, body").animate({scrollTop:TopT+'rem'},0);
+        },
+        GoToTh(){
+          var TopTh=$(".details")[0].offsetTop-0.94;
+          $("html, body").animate({scrollTop:TopTh+'rem'},0);
+        },
+        GoToF(){
+          var TopF=$("p.recommend-p")[0].offsetTop-0.94;
+          $("html, body").animate({scrollTop:TopF+'rem'},0);
+        },
+      }
     }
 </script>
 
 <style scoped>
+  .pic img{
+    width: 3.6rem;
+    height:4.6rem;
+    margin:0 auto;
+  }
+  .mint-swipe {
+    height: 4.6rem;
+  }
+  .desc {
+    /*font-weight: 600;*/
+    opacity: 0.9;
+    font-size: 0.18rem;
+    text-align: center;
+    padding: 5px;
+    height: 0.1rem;
+    /*line-height: 0.4rem;*/
+    width: 100%;
+    color: #fff;
+    background-color: rgba(0,0,0,0.2);
+    position: absolute;
+    bottom: 0;
+  }
 #productdetails {
   display: flex;
   flex-direction:column;
@@ -254,33 +429,28 @@ header {
   display:flex;
   flex-direction: row;
   justify-content: space-between;
-  width:90%;
+  width:100%;
   margin:0 auto;
   line-height:0.94rem;
+  position:fixed;
+  top:0;
+  left:0;
+  background-color: white;
 }
   header a {
     font-size:0.3rem;
   }
   header .iconfont {
     font-size: 0.4rem;
+    margin-right: 0.5rem;
+    margin-left: 0.1rem;
   }
   header .router-link-active {
     color:forestgreen;
     border-bottom:1px solid forestgreen;
   }
-  .all {
-    width:100%;
-    height:4.8rem;
-    position: relative;
-    padding:0.1rem 1.95rem;
-    border-top:0.01rem solid #eee;
-    border-bottom:0.01rem solid #eee;
-  }
-  .all .p-box {
-    width:3.6rem;
-    height:4.6rem;
-    overflow: hidden;
-    position: relative;
+  main {
+    margin-top:0.94rem;
   }
   .all ul {
     position:absolute;
@@ -409,7 +579,7 @@ ol li p {
   }
   .address {
     width:94%;
-    height:2.92rem;
+    height:2.02rem;
     margin:0 auto;
     border-bottom: 1px solid #eee;
     display: flex;
@@ -429,8 +599,11 @@ ol li p {
   }
   .more {
     padding:0.2rem 0;
-    line-height:0,5rem;
+    line-height:0.5rem;
     font-size: 0.24rem;
+  }
+  .address .three{
+    margin:0 0 0.1rem 0 ;
   }
   .more span {
     color:#666;
@@ -543,10 +716,6 @@ ol li p {
     font-size: 0.38rem;
     line-height:0.85rem;
   }
-  .details p a:nth-child(1):after{
-    content:"| ";
-    margin:0 0.3rem;
-  }
   .details p .router-link-active {
     color:forestgreen;
   }
@@ -647,10 +816,15 @@ ol li p {
     position: absolute;
     right:6.18rem;
     bottom:0;
+    padding-top: 0.1rem;
   }
   footer div .iconfont{
-    font-size: 0.6rem;
+    font-size: 0.38rem;
     text-align: center;
+  }
+  .checked{
+    font-weight: bold;
+    color: #f9524f;
   }
   footer div p {
     font-size: 0.18rem;
@@ -680,5 +854,15 @@ ol li p {
     text-align: center;
     line-height: 1rem;
     font-size: 0.3rem;
+  }
+  footer .ball {
+    width:0.2rem;
+    height:0.2rem;
+    position:absolute;
+    right:0;
+    top:0;
+    z-index: 99;
+    background-color:red;
+    border-radius: 50%;
   }
 </style>

@@ -4,20 +4,13 @@
       <router-link to="/home"><span class="return">&#xe602;</span></router-link>
       <h2>促销资讯</h2>
     </div>
-    <div class="banner">
-      <span class="reduce">满减</span>
-      <h3>当当自营超级品牌日</h3>
-      <p>全场3折封锁</p>
-      <img src="../../assets/img/new_banner.jpg" width="100%" height="200">
-      <p>2018-07-26</p>
-    </div>
     <ul class="list">
-      <li v-for="item in newsList">
+      <li v-for="item in newsList" @click="getType(item)">
         <span class="reduce">满减</span>
-        <h3>{{item.title}}</h3>
-        <p>{{item.discount}}</p>
-        <img :src="item.url" width="100" height="50">
-        <p>{{item.data}}</p>
+        <h3>{{item.b_description}}</h3>
+        <p>{{item.activityType}}</p>
+        <img :src="item.dt_img">
+        <p>2018-07-27</p>
       </li>
     </ul>
   </div>
@@ -28,14 +21,38 @@
         name: "News",
         data(){
         return{
-          newsList: [
-            {title: "图书大折扣，满减优惠多多………",url: require('@/assets/img/new_img1.jpg'),discount: "跨店2件5折" ,data: "2018-07-27"},
-            {title: "图书大折扣，满减优惠多多………",url: require('@/assets/img/new_img1.jpg'),discount: "跨店2件5折" ,data: "2018-07-27"},
-            {title: "图书大折扣，满减优惠多多………",url: require('@/assets/img/new_img1.jpg'),discount: "跨店2件5折" ,data: "2018-07-27"},
-            {title: "图书大折扣，满减优惠多多………",url: require('@/assets/img/new_img1.jpg'),discount: "跨店2件5折" ,data: "2018-07-27"}
-          ],
+          type: '',
+          newsList: [],
         }
-      }
+      },
+      mounted: function(){
+        this.show();
+      },
+      methods:{
+        getType(item){
+          this.$router.push({path: '/NewsDetail',query:{kind: item.activityType}});
+        },
+        show(){
+          var that = this;
+          $.ajax({
+            url: 'http://localhost:8080/bookInformation/queryAllActivitySale.action',
+            type: 'post',
+            dataType: 'json',
+            xhrFields: {
+              withCredentials: true   // 前端设置是否带cookie
+            },
+            crossDomain: true,
+            success: function (goods) {
+              that.newsList = JSON.parse(JSON.stringify(goods));
+              console.log(goods);
+            },
+            error: function () {
+              console.log("出错了！");
+            }
+          })
+        },
+      },
+
     }
 </script>
 
@@ -64,9 +81,6 @@
     -webkit-background-clip: text;
     color: transparent;
   }
-  .banner{
-    border-bottom: 1px solid #e6e6e6;
-  }
   .reduce{
     display: inline-block;
     line-height: 0.35rem;
@@ -79,18 +93,18 @@
     margin-top: 0.05rem;
     font-size: 0.13rem;
   }
-  .banner h3,.list li h3{
+  .list li h3{
     font-size: 0.28rem;
     line-height: 0.5rem;
     color: #333333;
   }
-  .banner p,.list li p{
+  .list li p{
     color: #8b8b8b;
     font-size: 0.22rem;
     line-height: 0.4rem;
     padding-left: 10px;
   }
-  .banner p:nth-of-type(2),.list li p:nth-of-type(2){
+  .list li p:nth-of-type(2){
     text-align: right;
     padding-right: 13px;
     line-height: 5vh;
@@ -99,14 +113,17 @@
     position: relative;
     border-bottom: 1px solid #e6e6e6;
     margin-bottom: 2vh;
+    /*height: 1.8rem;*/
   }
   .list li img{
     position: absolute;
     top: 10px;
     right: 10px;
+    width: 1.5rem;
+    height: 1rem;
   }
   ul.list li p:nth-of-type(2){
-    line-height: 1rem;
+    padding-top: 0.3rem;
   }
   .list li h3{
     width: 70%;

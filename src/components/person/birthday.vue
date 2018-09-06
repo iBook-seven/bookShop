@@ -5,19 +5,47 @@
     <h2>生日</h2>
   </div>
 
-    <input type="date"/>
-    <button type="submit">提交</button>
-  </div>
-</template>
+    <input type="date" v-model="birNum" />
+    <button type="button" @click="sub">提交</button>
 
+    </div>
+
+</template>
 <script>
     export default {
         name: "birthday",
+      data(){
+        return{
+          birNum: this.$route.query.bir,
+        }
+      },
+      methods:{
+          sub(){
 
+            var that = this;
+            $.ajax({
+              url: 'http://h5h5h5.free.idcfengye.com/user/updateMyInfo.action',
+              type: 'post',
+              dataType: 'json',
+              xhrFields: {
+                withCredentials: true    // 前端设置是否带cookie
+              },
+              data:{
+                userInfo:"u_birthday:"+this.birNum,
+              },
+              crossDomain: true,
+              success: function (goods) {
+                console.log(goods);
+                that.ssg = JSON.parse(JSON.stringify(goods));
+              },
+              error: function () {
+                console.log("出错");
+              }
+            })
 
+          }
 
-
-
+      },
     }
 </script>
 
@@ -38,6 +66,12 @@
     position: absolute;
     left:0.3rem;
 
+  }
+  .div1{
+    font-size: 1rem;
+    color: forestgreen;
+width: 4rem;
+    height: 2rem;
   }
   h2{
     margin: 0 auto;

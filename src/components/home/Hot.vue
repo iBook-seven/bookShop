@@ -5,7 +5,7 @@
       <h1>热销排行</h1>
     </div>
     <ul class="hot">
-      <li v-for="item in hotList">
+      <li v-for="item in hotList" @click="goto()">
         <h3>{{item.kind}}</h3>
         <p>{{item.discount}}</p>
         <img :src="item.url"/>
@@ -21,17 +21,22 @@
         data(){
           return{
             hotList: [
-              {url: require('@/assets/img/book1.jpg'),kind: "文学艺术", discount: "每满100减50"},
-              {url: require('@/assets/img/book2.jpg'),kind: "电子书", discount: "每满3件打6折"},
-              {url: require('@/assets/img/book3.jpg'),kind: "人文社科", discount: "每满100减50"},
-              {url: require('@/assets/img/book3.jpg'),kind: "亲子社科", discount: "每满3件打6折"},
-              {url: require('@/assets/img/book3.jpg'),kind: "亲子社科", discount: "每满3件打6折"},
-              {url: require('@/assets/img/book3.jpg'),kind: "亲子社科", discount: "每满3件打6折"},
-              {url: require('@/assets/img/book1.jpg'),kind: "文学艺术", discount: "每满100减50"},
-              {url: require('@/assets/img/book2.jpg'),kind: "电子书", discount: "每满3件打6折"},
-              {url: require('@/assets/img/book3.jpg'),kind: "人文社科", discount: "每满100减50"}
-            ]
+              {url: require('@/assets/img/rec-1.png'),kind: "文学艺术", discount: "每满100减50"},
+              {url: require('@/assets/img/rec-2.png'),kind: "电子书", discount: "每满3件打6折"},
+              {url: require('@/assets/img/rec-1.png'),kind: "人文社科", discount: "每满100减50"},
+              {url: require('@/assets/img/rec-2.png'),kind: "亲子社科", discount: "每满3件打6折"},
+              {url: require('@/assets/img/rec-1.png'),kind: "亲子社科", discount: "每满3件打6折"},
+              {url: require('@/assets/img/rec-2.png'),kind: "亲子社科", discount: "每满3件打6折"},
+              {url: require('@/assets/img/rec-1.png'),kind: "文学艺术", discount: "每满100减50"},
+              {url: require('@/assets/img/rec-2.png'),kind: "电子书", discount: "每满3件打6折"},
+              {url: require('@/assets/img/rec-1.png'),kind: "人文社科", discount: "每满100减50"}
+            ],
           }
+      },
+      methods:{
+        goto(){
+          this.$router.push({path: '/ProductDetails'});
+        }
       }
     }
 </script>
@@ -72,8 +77,8 @@
   }
   section .hot img{
     margin: 0 auto;
-    width: 1.2rem;
-    height: 1.3rem;
+    width: 1.5rem;
+    height: 2rem;
   }
   section .hot li h3{
     color: #333;
@@ -88,6 +93,7 @@
     font-size: 0.22rem;
   }
   section>img{
-    margin-bottom: 54px;
+    border-bottom: 0.15rem solid #ebf0f6;
+    margin-bottom: 0.2rem;
   }
 </style>

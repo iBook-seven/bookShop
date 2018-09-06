@@ -8,11 +8,11 @@
       <ul>
         <li>
           <span>收货人：</span>
-          <input type="text" placeholder="请输入收货人姓名"/>
+          <input type="text" placeholder="请输入收货人姓名" v-model="name"/>
         </li>
         <li>
           <span>手机：</span>
-          <input type="text" placeholder="请输入手机号"/>
+          <input type="number" placeholder="请输入手机号" v-model="tel"/>
         </li>
         <li>
           <span>所在地区：</span>
@@ -26,10 +26,10 @@
         </li>
         <li>
           <span>详细地址：</span>
-          <input type="text" placeholder="街道、楼牌号"/>
+          <input type="text" placeholder="街道、楼牌号" v-model="detail"/>
         </li>
       </ul>
-      <router-link to="/Address"><input type="submit" value="保存地址" class="sub"/></router-link>
+      <input type="button" value="保存地址" class="sub" @click="show"/>
     </form>
   </div>
 </template>
@@ -42,6 +42,10 @@
       data () {
         return {
           isShow: false,
+          name: '',
+          tel: '',
+          detail: '',
+          myaddress: {},
           myAddressSlots: [
             {
               flex: 1,
@@ -86,12 +90,38 @@
             this.myAddresscounty = values[2];
           }
         },
+        show(){
+          var that = this;
+          $.ajax({
+            url: 'http://h5h5h5.free.idcfengye.com/address/add.action',
+            type: 'post',
+            dataType: 'json',
+            data:{
+              a_consignee: this.name ,
+              a_phone: this.tel,
+              a_address: this.myAddressProvince+this.myAddressCity+this.myAddresscounty+','+this.detail,
+              a_id: this.id
+            },
+            xhrFields: {
+              withCredentials: true   // 前端设置是否带cookie
+            },
+            crossDomain: true,
+            success: function (address) {
+              // that.myaddress = JSON.parse(JSON.stringify(address));
+              console.log(address);
+            },
+            error: function () {
+              console.log("出错了！");
+            }
+          });
+          this.$router.push({path: '/Address'});
+        },
       },
       mounted(){
         this.$nextTick(() => { //vue里面全部加载好了再执行的函数 （类似于setTimeout）
           this.myAddressSlots[0].defaultIndex = 0
           // 这里的值需要和 data里面 defaultIndex 的值不一样才能够初始化
-          //因为我没有看过源码（我猜测是因为数据没有改变，不会触发更新）
+          // this.show();
         });
       }
     }

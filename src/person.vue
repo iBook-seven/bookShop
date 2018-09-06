@@ -2,7 +2,7 @@
   <div id="app">
     <header>
     <div id="wrap">
-      <p ><router-link to="/Login" tag="span">{{login}}/{{sign}}</router-link></p>
+      <p ><router-link to="/Login" tag="span">{{status}}</router-link></p>
       <p ><img :src="logo" width="30" height="30"></p>
      <router-link  class="jump" to="/setting"> {{p3}}</router-link>
     </div>
@@ -11,7 +11,7 @@
     <!--//content-->
     <div class="content">
       <div class="own"><span class="sw">{{msg}}</span>
-        <router-link to="/order"><span class="sa">{{tg}}</span></router-link></div>
+        <router-link to="/order"><span class="sa" >{{tg}}</span></router-link></div>
       <ul>
         <router-link to="/apply"><li>&#xe600;<br/><p>{{qb}}</p></li></router-link>
         <router-link to="/ssh"><li>&#xe626;<br/><p>{{sh}}</p></li></router-link>
@@ -23,15 +23,15 @@
     <div class="conten2">
       <div class="own"><span class="sw">{{msgp}}</span>
       </div>
-      <ul >
-        <li>&#xe622;<br/><router-link to="collect"><p>{{qbp}}</p></router-link></li>
-        <li>&#xe627;<br/><router-link to="wu"><p>{{fhp}}</p></router-link></li>
-        <li>&#xe67c;<br/> <router-link to="history"><p>{{shp}}</p></router-link></li>
-        <li>&#xe6f9;<br/><router-link to="#"><p>{{plp}}</p></router-link></li>
-        <li>&#xe618;<br/><router-link to="#"><p>{{qb1p}}</p></router-link></li>
-        <li>&#xe60d;<br/><router-link to="#"><p>{{fh1p}}</p></router-link></li>
-        <li>&#xe6a5;<br/><router-link to="#"><p>{{sh1p}}</p></router-link></li>
-        <li>&#xe61f;<br/> <router-link to="#"><p>{{pl1p}}</p></router-link></li>
+      <ul>
+        <router-link to="collect" class="p1" > <li>&#xe622;<p>{{qbp}}</p></li></router-link>
+        <router-link to="#"  class="p1"><li>&#xe627;<p>{{fhp}}</p></li></router-link>
+        <router-link to="history"  class="p1"><li>&#xe67c;<p>{{shp}}</p></li></router-link>
+        <router-link to="#"  class="p1"><li>&#xe6f9;<p>{{plp}}</p></li></router-link>
+        <router-link to="#"  class="p1"> <li>&#xe618;<p>{{qb1p}}</p></li></router-link>
+        <router-link to="#"  class="p1"> <li>&#xe60d;<p>{{fh1p}}</p></li></router-link>
+        <router-link to="#"  class="p1"><li>&#xe6a5;<p>{{sh1p}}</p></li></router-link>
+        <router-link to="#"  class="p1"><li>&#xe61f;<p>{{pl1p}}</p></li></router-link>
       </ul>
     </div>
     <app_footer></app_footer>
@@ -52,14 +52,13 @@
       return {
         //header
         /*title:'123',*/
-        login: '登录',
-        sign: '注册',
+        status: '登录/注册',
         logo: logo,
         // imgUrl:"../assets/logo.png",
         p3: '设置',
         //content
         msg: '我的订单',
-        tg: '查看所有订单 >',
+        tg: '查看所有订单 ',
         qb: "待付款",
         sh: "待收货",
         pl: "待评论",
@@ -74,17 +73,30 @@
         fh1p: "安全中心",
         sh1p: "领劵中心",
         pl1p: "我的拍卖",
+        userName: this.$route.query.u_name,
       }
+      },
+    mounted(){
+      this.judge();
+    },
+    methods: {
+      judge(){
+        if(this.userName){
+          this.status = this.userName;
+        }
       }
+    }
   }
 </script>
-
 <style scoped>
   /*
 header*/
   #app {
     text-align: center;
     color: #2c3e50;
+  }
+  .p1{
+    width:25%;
   }
   header{
     width:100%;
@@ -194,7 +206,7 @@ header*/
     font-family: 'iconfont';
     font-size:0.4rem;
     color:#009a61;
-    width:25%;
+
   }
   .conten2 p{
     margin-top:0.3rem;

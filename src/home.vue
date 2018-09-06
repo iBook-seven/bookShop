@@ -6,8 +6,9 @@
     <author></author>
     <superkill></superkill>
     <hot></hot>
+    <loadMore></loadMore>
     <app_footer></app_footer>
-    <router-view/>
+    <!--<router-view/>-->
   </div>
 </template>
 
@@ -18,6 +19,7 @@
     import SuperKill from './components/home/SuperKill'
     import Author from './components/home/Author'
     import Hot from './components/home/Hot'
+    import LoadMore from './components/home/LoadMore'
     import Footer from './components/home/Footer'
     export default {
         name: "home",
@@ -28,7 +30,8 @@
         "superkill": SuperKill,
         "author": Author,
         "hot": Hot,
-         "app_footer": Footer
+        "app_footer": Footer,
+        "loadMore": LoadMore
       }
     }
 </script>

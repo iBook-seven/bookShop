@@ -1,25 +1,65 @@
 <template>
   <div id="setnew">
-    <router-link to="FNoteGet"><span class="iconfont header">&#xe606;</span></router-link>
+    <router-link to="/#"><span class="iconfont header">&#xe606;</span></router-link>>
     <p class="s-write">设置新密码</p>
     <form action="#" method="post" name="form">
       <div class="s-password">
         <span class="iconfont">&#xe604;</span>
-        <input type="text" name="s-password" placeholder="请输入新密码"/>
+        <input type="text" name="u_password" placeholder="请输入新密码" @blur="Paswo" v-model="u_password"/>
         <span class="iconfont s-password-open">&#xe901;</span>
       </div>
-      <router-link to="/Login"><a href="" class="setingnpwd">设置新密码</a></router-link>
+      <input type="button" @click="Fnewp" value="完成" class="setingnpwd"/>
     </form>
+    <p>{{hello}}</p>
+    <p class="goodpsd" v-show="goodpsda">密码不能含有非法字符，长度在4-10之间</p>
     <p class="set-about">为保障您账户安全，请不要设置与邮箱密码相同的账户登录密码，谨防诈骗</p>
   </div>
 </template>
 
 <script>
   export default {
-    name: 'HelloWorld',
+    name: 'SetNew',
     data () {
       return {
-
+        goodpsda: false,
+        u_password:'',
+        hello:''
+      }
+    },
+    methods:{
+      Paswo:function(){
+        var item=$("input")[1];
+        var reg=/^[a-zA-Z0-9]{4,10}$/;
+        if(reg.test(item)==false){
+          this.goodpsda=!this.goodpsda;
+        }else{
+          this.goodpsda=false;
+        }
+      },
+      Fnewp :function(){
+        var that = this;
+        $.ajax({
+          url: 'http://h5h5h5.free.idcfengye.com/user/updatePassword.action',
+          data:{u_password:this.u_password},
+          type: 'post',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true   //前端设置是否带cookie
+          },
+          crossDomain: true,
+          success: function (list) {
+            var helll=JSON.parse(JSON.stringify(list));
+            if(helll.message=="success"){
+              console.log(helll.messages);
+              // that.$router.push({path:'/home'});
+            }else{
+              that.hello = helll.message;
+            }
+          },
+          error: function () {
+            that.hello="验证码输入错误";
+          }
+        })
       }
     }
   }
@@ -61,7 +101,9 @@
     justify-content: space-between;
     padding-top:0.3rem;
   }
-  .setingnpwd {  width:80%;
+  .setingnpwd {
+    display: block;
+    width:80%;
     height:0.9rem;
     margin:0.8rem auto;
     text-align:center;

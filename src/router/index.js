@@ -1,15 +1,19 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+//首页
 import home from '@/home'
-import sort from '@/sort'
 import setting from '@/setting'
 import person from '@/person'
 import NewsPage from '@/components/home/NewsPage'
 import SuperKillPage from '@/components/home/SuperKillPage'
-//个人中心
+import AuthorBook from '@/components/home/AuthorBook'
+import NewsDetail from '@/components/home/NewsDetail'
+import Search from '@/components/home/Search'
 import Address from '@/components/home/Address'
 import EditAddress from '@/components/home/EditAddress'
 import AddAddress from '@/components/home/AddAddress'
+
+//个人中心
 import img from '@/components/person/img'
 import mail from '@/components/person/mail'
 import sex from '@/components/person/sex'
@@ -26,6 +30,7 @@ import order from '@/order'
 import history from '@/components/person/history'
 //分类
 import bang from '@/components/classify/bang'
+import sort from '@/sort'
 import catalog from '@/components/classify/catalog'
 //购物车
 import goods from '@/goods'
@@ -43,11 +48,15 @@ import RNoteGet from '@/components/loginandregister/RNoteGet.vue'
 import RSetNew from '@/components/loginandregister/RSetNew.vue'
 //详情页
 import ProductDetails from '@/ProductDetails'
-import Public from '@/components/loginandregister/Public.vue'
 
 Vue.use(Router)
 
 export default new Router({
+  mode: 'history',
+  base: '/mobile/',
+  scorllBehavior: () => ({
+    y: 0
+  }),
   routes: [
     {
       path: '',
@@ -76,6 +85,18 @@ export default new Router({
     {
       path: '/SuperKillPage',
       component: SuperKillPage
+    },
+    {
+      path: '/AuthorBook',
+      component: AuthorBook
+    },
+    {
+      path: '/NewsDetail',
+      component: NewsDetail
+    },
+    {
+      path: '/Search',
+      component: Search
     },
     {
       path: '/Address',
@@ -204,9 +225,5 @@ export default new Router({
       path: '/RSetNew',
       component: RSetNew
     },
-    {
-      path: '/Public',
-      component: Public
-    }
   ]
 })
